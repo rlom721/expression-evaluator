@@ -60,7 +60,7 @@ namespace lomboy_a2 {
     template <class DataType>
     void List<DataType>::insertToHead(const listDataType& entry) {
         // check if there is space to allocate - otherwise, exception is thrown
-        if (canAllocate()) {
+        if (!isFull()) {
 
             listItemType* newItemPtr = new listItemType(entry); // new item has entry data
 
@@ -89,7 +89,7 @@ namespace lomboy_a2 {
     template <class DataType>
     void List<DataType>::insertToTail(const listDataType& entry) {
         // check if there is space to allocate - otherwise, exception is thrown
-        if (canAllocate()) {
+        if (!isFull()) {
             listItemType* newItemPtr = new listItemType(entry); // new item has entry data
 
             newItemPtr->setKey(keyMkr++);   // set unique key of item
@@ -117,7 +117,7 @@ namespace lomboy_a2 {
     template <class DataType>
     void List<DataType>::insertToMid(const listDataType& entry) {
         // check if there is space to allocate - otherwise, exception is thrown
-        if (canAllocate()) {
+        if (!isFull()) {
             listItemType* listPtr = headPtr;    // to go through list
             listItemType* newItemPtr = new listItemType(entry); // new item has entry data
 
@@ -159,67 +159,70 @@ namespace lomboy_a2 {
     // This method deletes item with a matching key.
     template <class DataType>
     void List<DataType>::remove(int key) {
-        listItemType* temp;     // points to item to delete
-        // listItemType* prevItem, nextItem;   // to be used in remove from middle case
-        temp = find(key);   // if found, returns pointer to item. if not, nullptr
+        if (!isEmpty()) {
+            listItemType* temp;     // points to item to delete
+            // listItemType* prevItem, nextItem;   // to be used in remove from middle case
+            temp = find(key);   // if found, returns pointer to item. if not, nullptr
 
-        // list is empty
-        if (headPtr == nullptr) {
-            cout << "List is empty.\n";
-        }
-        // item not found
-        else if (temp == nullptr) {
-            cout << "Invalid key.\n";
-        }
-        // remove from head by setting headPtr to next
-        else if (temp == headPtr) {
-            headPtr = temp->getNext();
+            // list is empty
+            if (headPtr == nullptr) {
+                cout << "List is empty.\n";
+            }
+            // item not found
+            else if (temp == nullptr) {
+                cout << "Invalid key.\n";
+            }
+            // remove from head by setting headPtr to next
+            else if (temp == headPtr) {
+                headPtr = temp->getNext();
 
-            // set headPtr to next item if after delete list has more than one item, 
-            if (headPtr != nullptr)
-                headPtr->setPrev(nullptr);
-            else 
-                tailPtr = nullptr;
-        }
-        // remove from tail by setting tailPtr to prev
-        else if (temp == tailPtr) {
-            tailPtr = temp->getPrev();
+                // set headPtr to next item if after delete list has more than one item, 
+                if (headPtr != nullptr)
+                    headPtr->setPrev(nullptr);
+                else 
+                    tailPtr = nullptr;
+            }
+            // remove from tail by setting tailPtr to prev
+            else if (temp == tailPtr) {
+                tailPtr = temp->getPrev();
 
-            // set tailPtr to next item if after delete list has more than one item, 
-            if (headPtr != nullptr)
-                tailPtr->setNext(nullptr);
-            else 
-                headPtr = nullptr;
+                // set tailPtr to next item if after delete list has more than one item, 
+                if (headPtr != nullptr)
+                    tailPtr->setNext(nullptr);
+                else 
+                    headPtr = nullptr;
+            }
+            // remove from middle by linking previous and next to each other
+            else {
+                listItemType* prevItem = temp->getPrev();   // item before temp
+                listItemType* nextItem = temp->getNext();   // item after temp
+                // prevItem = temp->getPrev();   // item before temp
+                // nextItem = temp->getNext();   // item after temp
+
+                // link previous to next and next to previous
+                prevItem->setNext(nextItem);
+                nextItem->setPrev(prevItem);
+
+                // set temp pointers to nullptr
+                prevItem = nullptr;
+                nextItem = nullptr;
+            }
+
+            size--;
+
+            // free memory of unlinked item, and null out temp pointers used
+            delete temp;  
+            temp = nullptr;
         }
-        // remove from middle by linking previous and next to each other
         else {
-            listItemType* prevItem = temp->getPrev();   // item before temp
-            listItemType* nextItem = temp->getNext();   // item after temp
-            // prevItem = temp->getPrev();   // item before temp
-            // nextItem = temp->getNext();   // item after temp
-
-            // link previous to next and next to previous
-            prevItem->setNext(nextItem);
-            nextItem->setPrev(prevItem);
-
-            // set temp pointers to nullptr
-            prevItem = nullptr;
-            nextItem = nullptr;
+            cout << "Cannot remove items from empty list.\n";
         }
-
-        size--;
-
-        // free memory of unlinked item, and null out temp pointers used
-        delete temp;  
-        temp = nullptr;
-        // prevItem = nullptr;
-        // nextItem = nullptr;
     }
 
     // This method deletes item at head.
     // Works for empty list and one list item cases.
     template <class DataType>
-    void List<DataType>::removeHead() {
+    void List<DataType>::removeHead() {            
         int headKey = -1;
 
         if (headPtr != nullptr)
@@ -254,60 +257,72 @@ namespace lomboy_a2 {
     }
 
     // This method implements the selection sort algorithm to sort items in list.
+    // Checks if list is empty.
     template <class DataType>
     void List<DataType>::sortAsc() {
-        listItemType* item1ptr = headPtr;             // iterate through inner loop
-        listItemType* item2ptr = headPtr->getNext();  // iterate through outer loop
-        int outCount = 0,       // outer loop count (1st item)
-            inCount = 0;        // inner loop count (2nd item)
+        if (!isEmpty()) {
+            listItemType* item1ptr = headPtr;             // iterate through inner loop
+            listItemType* item2ptr = headPtr->getNext();  // iterate through outer loop
+            int outCount = 0,       // outer loop count (1st item)
+                inCount = 0;        // inner loop count (2nd item)
 
-        // outer loop controls iterations of first item value to compare
-        // inner loop compares rest of list values to first each iteration
-        while (item1ptr != nullptr && outCount < size - 1) {
-            // move inner loop pointer back to right after item1ptr
-            item2ptr = item1ptr->getNext();     
-            while (item2ptr != nullptr && inCount < size) {
-                // item2ptr's data is less, so swap data and key
-                if (item2ptr->getData() < item1ptr->getData())
-                    swapItems(*item1ptr, *item2ptr);
+            // outer loop controls iterations of first item value to compare
+            // inner loop compares rest of list values to first each iteration
+            while (item1ptr != nullptr && outCount < size - 1) {
+                // move inner loop pointer back to right after item1ptr
+                item2ptr = item1ptr->getNext();     
+                while (item2ptr != nullptr && inCount < size) {
+                    // item2ptr's data is less, so swap data and key
+                    if (item2ptr->getData() < item1ptr->getData())
+                        swapItems(*item1ptr, *item2ptr);
 
-                item2ptr = item2ptr->getNext(); // point to next item
-                inCount++;
+                    item2ptr = item2ptr->getNext(); // point to next item
+                    inCount++;
+                }
+                item1ptr = item1ptr->getNext(); // point to next item
+                outCount++;
             }
-            item1ptr = item1ptr->getNext(); // point to next item
-            outCount++;
+            // prevent dangling pointers!
+            item1ptr = nullptr;
+            item2ptr = nullptr;
         }
-        // prevent dangling pointers!
-        item1ptr = nullptr;
-        item2ptr = nullptr;
+        else {
+            cout << "List is empty. No items to be sorted.\n";
+        }
     }
     // This method implements the selection sort algorithm to sort items in list.
+    // Checks if list is empty.
     template <class DataType>
     void List<DataType>::sortDesc() {
-        listItemType* item1ptr = headPtr;             // iterate through inner loop
-        listItemType* item2ptr = headPtr->getNext();  // iterate through outer loop
-        int outCount = 0,       // outer loop count (1st item)
-            inCount = 0;        // inner loop count (2nd item)
+        if (!isEmpty()) {
+            listItemType* item1ptr = headPtr;             // iterate through inner loop
+            listItemType* item2ptr = headPtr->getNext();  // iterate through outer loop
+            int outCount = 0,       // outer loop count (1st item)
+                inCount = 0;        // inner loop count (2nd item)
 
-        // outer loop controls iterations of first item value to compare
-        // inner loop compares rest of list values to first each iteration
-        while (item1ptr != nullptr && outCount < size - 1) {
-            // move inner loop pointer back to right after item1ptr
-            item2ptr = item1ptr->getNext();     
-            while (item2ptr != nullptr && inCount < size) {
-                // item2ptr's data is less, so swap data and key
-                if (item2ptr->getData() > item1ptr->getData())
-                    swapItems(*item1ptr, *item2ptr);
+            // outer loop controls iterations of first item value to compare
+            // inner loop compares rest of list values to first each iteration
+            while (item1ptr != nullptr && outCount < size - 1) {
+                // move inner loop pointer back to right after item1ptr
+                item2ptr = item1ptr->getNext();     
+                while (item2ptr != nullptr && inCount < size) {
+                    // item2ptr's data is less, so swap data and key
+                    if (item2ptr->getData() > item1ptr->getData())
+                        swapItems(*item1ptr, *item2ptr);
 
-                item2ptr = item2ptr->getNext(); // point to next item
-                inCount++;
+                    item2ptr = item2ptr->getNext(); // point to next item
+                    inCount++;
+                }
+                item1ptr = item1ptr->getNext(); // point to next item
+                outCount++;
             }
-            item1ptr = item1ptr->getNext(); // point to next item
-            outCount++;
+            // prevent dangling pointers!
+            item1ptr = nullptr;
+            item2ptr = nullptr;
+        } 
+        else {
+            cout << "List is empty. No items to be sorted.\n";
         }
-        // prevent dangling pointers!
-        item1ptr = nullptr;
-        item2ptr = nullptr;
     }            
 
     // This helper function swaps two ListItems in the list (only their data).
@@ -387,8 +402,8 @@ namespace lomboy_a2 {
     // This method returns true if there is no space to allocate a new item.
     // It also throws an exception to indicate a bad_alloc.
     template <class DataType>
-    bool List<DataType>::canAllocate() const { 
-        bool hasSpace = false;
+    bool List<DataType>::isFull() const { 
+        bool listIsFull = false;
 
         try {
             listItemType* testItem = new listItemType;   // test item to check space
@@ -396,14 +411,14 @@ namespace lomboy_a2 {
             // delete allocated memory (will occur if there is no exception thrown)
             delete testItem;
             testItem = nullptr;
-            hasSpace = true;
         }
         catch (bad_alloc& ba) {
+            listIsFull = true;
             cerr << "Not enought memory to allocate new item. bad_alloc caught: "
                  << ba.what() << '\n';
         }
 
-        return hasSpace;
+        return listIsFull;
     }
 
     // This helper function searches through list for an item with a matching key,

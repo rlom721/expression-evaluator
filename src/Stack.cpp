@@ -25,13 +25,25 @@ namespace lomboy_a2 {
     // This method adds an entry to the stack.
     template <class DataType>
     void Stack<DataType>::push(stackDataType entry) {
-        this->insertToHead(entry);
-        size = this->getSize();
+        // check if stack is full
+        if (!this->isFull()) {
+            this->insertToHead(entry);
+            size = this->getSize();
+        }
     }
 
     // This method pops an entry off the top of the stack and returns it.
+    // If stack is empty, prints out error message and returns default value of stack
+    // data type.
     template <class DataType>
     typename Stack<DataType>::stackDataType Stack<DataType>::pop() {
+
+        // check if stack is empty
+        if (this->isEmpty()) {
+            cout << "Cannot pop from empty stack.\n";
+            return stackDataType();
+        }
+        
         typename List<DataType>::iterator topItem = this->start();       // assign iterator to top item
         stackDataType topData = *topItem; // store data of item to return after deletion
 
@@ -54,12 +66,12 @@ namespace lomboy_a2 {
         return (size == 0); 
     }
 
-    // This method returns true if there is no space to allocate a new item on stack.
-    // It also throws an exception to indicate a bad_alloc.
-    template <class DataType>
-    bool Stack<DataType>::isFull() const { 
-        return this->canAllocate();
-    }
+    // // This method returns true if there is no space to allocate a new item on stack.
+    // // It also throws an exception to indicate a bad_alloc.
+    // template <class DataType>
+    // bool Stack<DataType>::isFull() const { 
+    //     return List<DataType>::isFull();
+    // }
 
     // This method shows the top entry of the stack.
     template <class DataType>

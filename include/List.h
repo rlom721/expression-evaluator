@@ -43,11 +43,12 @@ namespace lomboy_a2 {
         void sortAsc();            // uses selection sort
         void sortDesc();
         void iterate();            // displays list contents to console as linked list!
+        bool isEmpty() { return (size == 0); }         
         // Constant methods
         iterator start() const; 
         iterator end() const;
         listDataType getData(int key);
-        bool canAllocate() const;
+        bool isFull() const;
         int getSize() const { return size; };
         // Friend functions and classes
         friend std::ostream& operator<< <DataType>(std::ostream& out, const List<DataType>& l);
