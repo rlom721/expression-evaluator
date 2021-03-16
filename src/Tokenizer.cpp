@@ -2,38 +2,82 @@
 // File name: Tokenizer.cpp
 
 #include "Tokenizer.h"
+#include <iostream>     // for cout
 #include <cassert>
 using namespace std;
 namespace lomboy_a2 {
 
     // Default constructor sets values to defaults
-    Tokenizer::Tokenizer() : str(""), delimiters("\0"), index(0) { }
+    Tokenizer::Tokenizer() : str(""), delimiters(" "), index(0), retDelim(true) { }
 
     // Parametrized constructor sets member variables to arguments and index to 0
     Tokenizer::Tokenizer(string str, string delims)
-        : str(str), delimiters('\0' + delims), index(0) { }
+        : str(str), delimiters(delims), index(0), retDelim(true) { }
 
     // Copy constructor copies member variables
     Tokenizer::Tokenizer(const Tokenizer& tkn) {
         str = tkn.str;
         delimiters = tkn.delimiters;
         index = tkn.index;
+        retDelim = tkn.retDelim;
     }
 
+    // Sets str member to be tokenized
+    void Tokenizer::setStr(string str) {
+        this->str = str;
+    }
+
+    // Sets delimiters for parsing
+    void Tokenizer::setDelims(string delims) {
+        delimiters = delims;
+    }
+
+    // Sets retDelim to true or false
+    // If true, getNextToken() method will return delimiters as tokens if found in str.
+    void Tokenizer::returnDelim(bool tf) {
+        retDelim = tf;
+    }            
+
     // Returns following token in str and moves index to next position for future use
-    // Uses str as default if no input provided
-    // Does NOT check if at end - yet!
+    // If retDelim is true, will also return delimiters as tokens if found
+    // If char is part of ignores, it will skip them
     string Tokenizer::getNextToken() {
-        string token;                   // to return processed token
-        size_t endOfToken;              // either delimiter or npos
-        endOfToken = str.find(delimiters);
+        string token = "";                   // to return processed token
+        bool foundDelim = false;             // flag
 
-        // check that there are still tokens to read
-        assert(hasNext());
+        // if index already at end of str, reset
+        if (!hasNext()) {
+            cout << "End of string reached. Resetting index to start...\n";
+            index = 0;
+        }
 
-        // parse out string to get next token, then reposition index
-        token = str.substr(index, endOfToken);
-        index = endOfToken;
+        // check that there are still tokens to read and delimiter not found
+        while (hasNext() && !foundDelim) {
+
+            // if delimiter, add to token, increment count and set flag
+            if (isDelim(str[index])) {
+                token += str[index++];
+                foundDelim = true;
+            }
+            // if number, add to token then check if float
+            else if (isdigit(str[index])) {
+                token += str[index++];
+
+                // if float, add decimal point and digits to token (and increment index)
+                if (str[index] == '.') {
+                    while (isdigit(str[index]) && hasNext()) token += str[index++];
+                }
+
+                foundDelim = (isDelim(str[index]) ? true : false);
+            }
+            // else, is identifier (potential to check for invalid chars later...)
+            else {
+                // loop until delimiter found or end reached
+                while (!isDelim(str[index]) && hasNext()) token += str[index++];
+
+                foundDelim = true;
+            }
+        }
 
         return token;
     }

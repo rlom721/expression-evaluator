@@ -17,20 +17,22 @@ namespace lomboy_a2 {
         // Modification methods
         void setStr(std::string str);
         void setDelims(std::string delims);
+        void returnDelim(bool tf);             // sets retDelim
         std::string getNextToken();
         void reset();
         // Constant methods
         std::string getStr() { return str; }
         std::string getDelims() { return delimiters; }
         size_t getIndex() { return index; }
-        bool isDelim(char c);
     private:
         // Helper functions
         bool hasNext();
+        bool isDelim(char c); 
         // Member variables
         std::string str;
         std::string delimiters;
-        size_t index;       // keeps track of current string position
+        size_t index;         // keeps track of current string position
+        bool retDelim;        // getNextToken will return delimiters
     };
 
 }

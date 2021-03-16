@@ -27,17 +27,18 @@ bool isIdentifier(string id);
 
 int main () {
 
-    Tokenizer tknzr("Hello world!", " ");
+    Tokenizer tknzr("Hello 2 world!", " ");
 
     cout << "str: " << tknzr.getStr() 
-         << "\ndelims: " << tknzr.getDelims() 
-         << "\nnext token: " << tknzr.getNextToken() 
-         << "\nindex: " << int(tknzr.getIndex())
-         << "\nnext token: " << tknzr.getNextToken() 
-         << "\nindex: " << tknzr.getIndex() << endl;
-    
-    cout << "Is   a delim? " << (tknzr.isDelim(' ') ? "yes" : "no") << endl;
-    cout << "Is @ a delim? " << (tknzr.isDelim('@') ? "yes" : "no") << endl;
+         << "\ndelims: " << tknzr.getDelims();
+
+    for (int i = 0; i < 10; i++) { 
+        cout  << "\nnext token: " << tknzr.getNextToken() 
+         << "\nindex: " << tknzr.getIndex();
+    }
+
+    cout << endl;
+
     // double A = 2.0, B = 3.0, C = 4.0, D = 5.0;
 
     // Ask for user input
@@ -46,7 +47,7 @@ int main () {
     // parse from infix to postfix!
 
     // evaluate("A B *");
-
+    // cout << "Yo\n";
     return 0;
 }
 
