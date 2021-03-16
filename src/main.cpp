@@ -27,17 +27,31 @@ bool isIdentifier(string id);
 
 int main () {
 
-    Tokenizer tknzr("Hello 2 world!", " ");
+    // Tokenizer tknzr("4x y+*", " ()+-*");
 
-    cout << "str: " << tknzr.getStr() 
-         << "\ndelims: " << tknzr.getDelims();
+    // cout << "str: " << tknzr.getStr() 
+    //      << "\ndelims: " << tknzr.getDelims();
 
-    for (int i = 0; i < 10; i++) { 
-        cout  << "\nnext token: " << tknzr.getNextToken() 
-         << "\nindex: " << tknzr.getIndex();
+    // for (int i = 0; i < 9; i++) { 
+    //     cout  << "\nnext token: " << tknzr.getNextToken() 
+    //      << "\nindex: " << tknzr.getIndex();
+    // }
+
+    // cout << endl;
+
+    cout << "Next Tokenizer...\n";
+    Tokenizer t1;
+    t1.setStr("4x sin( cosy+*");
+    t1.setDelims(" ()+-*");
+
+    cout << "str: " << t1.getStr() 
+         << "\ndelims: " << t1.getDelims() << endl;
+
+    for (int i = 0; i < 11; i++) { 
+        cout  << "next token: " << t1.getNextToken() << "\n";
+            //   << (t1.getNextToken() == "" ? " (empty)": " (not empty)") 
+            //   << "\nindex: " << t1.getIndex() << "\n";
     }
-
-    cout << endl;
 
     // double A = 2.0, B = 3.0, C = 4.0, D = 5.0;
 

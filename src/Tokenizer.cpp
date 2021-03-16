@@ -8,18 +8,19 @@ using namespace std;
 namespace lomboy_a2 {
 
     // Default constructor sets values to defaults
-    Tokenizer::Tokenizer() : str(""), delimiters(" "), index(0), retDelim(true) { }
+    Tokenizer::Tokenizer() : str(""), delimiters(" "), ignores(" "), index(0), retDelims(true) { }
 
     // Parametrized constructor sets member variables to arguments and index to 0
     Tokenizer::Tokenizer(string str, string delims)
-        : str(str), delimiters(delims), index(0), retDelim(true) { }
+        : str(str), delimiters(delims), ignores(" "), index(0), retDelims(true) { }
 
     // Copy constructor copies member variables
     Tokenizer::Tokenizer(const Tokenizer& tkn) {
         str = tkn.str;
         delimiters = tkn.delimiters;
+        ignores = tkn.ignores;
         index = tkn.index;
-        retDelim = tkn.retDelim;
+        retDelims = tkn.retDelims;
     }
 
     // Sets str member to be tokenized
@@ -32,18 +33,18 @@ namespace lomboy_a2 {
         delimiters = delims;
     }
 
-    // Sets retDelim to true or false
+    // Sets retDelims to true or false
     // If true, getNextToken() method will return delimiters as tokens if found in str.
-    void Tokenizer::returnDelim(bool tf) {
-        retDelim = tf;
+    void Tokenizer::returnDelims(bool tf) {
+        retDelims = tf;
     }            
 
     // Returns following token in str and moves index to next position for future use
-    // If retDelim is true, will also return delimiters as tokens if found
+    // If retDelims is true, will also return delimiters as tokens if found
     // If char is part of ignores, it will skip them
     string Tokenizer::getNextToken() {
         string token = "";                   // to return processed token
-        bool foundDelim = false;             // flag
+        bool endToken = false;             // flag
 
         // if index already at end of str, reset
         if (!hasNext()) {
@@ -52,12 +53,17 @@ namespace lomboy_a2 {
         }
 
         // check that there are still tokens to read and delimiter not found
-        while (hasNext() && !foundDelim) {
+        while (hasNext() && !endToken) {
 
-            // if delimiter, add to token, increment count and set flag
+            // if delimiter and set to be tokenized, add to token, increment count and set flag
+            // else if not returnDelim, skip (by not ending token)
             if (isDelim(str[index])) {
-                token += str[index++];
-                foundDelim = true;
+                if(retDelims && !isIgnored(str[index])) {
+                    token += str[index];
+                    endToken = true;
+                }
+
+                index++;
             }
             // if number, add to token then check if float
             else if (isdigit(str[index])) {
@@ -65,17 +71,19 @@ namespace lomboy_a2 {
 
                 // if float, add decimal point and digits to token (and increment index)
                 if (str[index] == '.') {
+                    token += str[index++];
                     while (isdigit(str[index]) && hasNext()) token += str[index++];
                 }
 
-                foundDelim = (isDelim(str[index]) ? true : false);
+                // note: str[index] can be delimiter or string
+                endToken = true;  
             }
-            // else, is identifier (potential to check for invalid chars later...)
+            // else, is string (potential to check for invalid chars later...)
             else {
                 // loop until delimiter found or end reached
                 while (!isDelim(str[index]) && hasNext()) token += str[index++];
 
-                foundDelim = true;
+                endToken = true;
             }
         }
 
@@ -89,18 +97,28 @@ namespace lomboy_a2 {
 
     // Checks if a character is a delimter, returns true if so
     bool Tokenizer::isDelim(char c) {
-        bool isDelim = false;
+        return isFound(c, delimiters);
+    }
+
+    // Checks if a character is part of ignores, returns true if so
+    bool Tokenizer::isIgnored(char c) {
+        return isFound(c, ignores);
+    }
+
+
+    // Checks if a character is part of a string, returns true if so
+    // To be used with isDelim and isIgnored
+    bool Tokenizer::isFound(char c, string chars) {
+        bool isFound = false;
         size_t i = 0;
 
-        // loop over all delimiters until match found or end reached
-        while (i < delimiters.length() && !isDelim) {
-            if (c == delimiters[i]) isDelim = true;
+        // loop over all chars until match found or end reached
+        while (i < chars.length() && !isFound) {
+            if (c == chars[i]) isFound = true;
             i++;
         }
 
-        return isDelim;
+        return isFound;
     }
-
-    // void Tokenizer::reset()
 
 }
