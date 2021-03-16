@@ -15,63 +15,59 @@
 #include "Stack.cpp"          // testing derived class (parent is List class)
 #include "DataClass.h"      // for producing test data
 #include <string>
+#include <Tokenizer.h>
+// #include <cctype>
+// #include <math.h>
 using namespace std;
 using namespace lomboy_a2;
 
 // Function prototypes
+double evaluate(string expression);
+bool isIdentifier(string id);
 
 int main () {
-    cout << "TESTING LIST CLASS\n";
-    List<string> strList;
 
-    strList.insertToTail("K");
-    strList.insertToTail("O");
-    strList.insertToTail("R");
-    strList.insertToTail("R");
-    strList.insertToTail("A");
+    Tokenizer tknzr("Hello world!", " ");
 
-    cout << strList;
-    cout << "List " << (strList.isFull() ? "is full": "is not full") << endl;
-
-    cout << "TESTING STACK CLASS\n";
-    Stack<int> intStack;
-
-    intStack.push(7);
-    intStack.push(4);
-    intStack.push(3);
-
-    cout << "Stack " << (intStack.isFull() ? "is full": "is not full") << endl;
-    cout << intStack;
-
-    cout << "Popping off stack!\n";
-    // cout << intStack.pop();
-    cout << intStack.pop() << endl 
-         << intStack.pop() << endl
-         << intStack.pop() << endl
-         << intStack.pop() << endl
-         << intStack.pop() << endl;
-
-    cout << intStack;
-
-    intStack.sortDesc();
-    cout << intStack;
+    cout << "str: " << tknzr.getStr() 
+         << "\ndelims: " << tknzr.getDelims() 
+         << "\nnext token: " << tknzr.getNextToken() 
+         << "\nindex: " << int(tknzr.getIndex())
+         << "\nnext token: " << tknzr.getNextToken() 
+         << "\nindex: " << tknzr.getIndex() << endl;
     
-    Stack<char> strStack;
+    cout << "Is   a delim? " << (tknzr.isDelim(' ') ? "yes" : "no") << endl;
+    cout << "Is @ a delim? " << (tknzr.isDelim('@') ? "yes" : "no") << endl;
+    // double A = 2.0, B = 3.0, C = 4.0, D = 5.0;
 
-    strStack.push('K');
-    strStack.push('O');
-    strStack.push('R');
-    strStack.push('R');
-    strStack.push('A');
+    // Ask for user input
 
-    cout << strStack;
+    // cout << "\nTesting evaluator!\n";
+    // parse from infix to postfix!
 
-    cout << "Popping letters off:\n";
-
-    while (!strStack.isEmpty())
-        cout << strStack.pop() << endl;
-
-    cout << strStack;
+    // evaluate("A B *");
 
     return 0;
 }
+
+
+
+// // This method takes a postfix expression and performs the calculation, then returns
+// // the result as a double.
+// // Assumes each parenthesis is paired and symbols are separated by spaces.
+// double evaluate(string expression) {
+//     Stack<double> nums;     // will contain operands, then final result
+//     string token = "";      // process tokens from string
+//     double result = 0;      // result of operation
+
+//     while (token !=)
+
+//     // if (isIdentifier())
+
+//     return result;
+// }
+
+// // Determines if string is a predefined identifier and returns true if so.
+// bool isIdentifier(string id) {
+//     return (id == "A") || (id == "B") || (id == "C") || (id == "D");
+// }
