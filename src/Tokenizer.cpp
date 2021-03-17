@@ -9,7 +9,8 @@ using namespace std;
 namespace lomboy_a2 {
 
     // Default constructor sets values to defaults
-    Tokenizer::Tokenizer() : str(""), delimiters(" "), ignores(" "), index(0), retDelims(true) { }
+    Tokenizer::Tokenizer() 
+        : str(""), delimiters(" "), ignores(" "), index(0), retDelims(true) { }
 
     // Parametrized constructor sets member variables to arguments and index to 0
     Tokenizer::Tokenizer(string str, string delims)
@@ -22,6 +23,7 @@ namespace lomboy_a2 {
         ignores = tkn.ignores;
         index = tkn.index;
         retDelims = tkn.retDelims;
+        // tokens = tkn.tokens;
     }
 
     // Sets str member to be tokenized
@@ -48,14 +50,14 @@ namespace lomboy_a2 {
     // Returns following token in str and moves index to next position for future use
     // If retDelims is true, will also return delimiters as tokens if found
     // If char is part of ignores, it will skip them
+    // Returns NULL if there is an ignore at the end.
     string Tokenizer::getNextToken() {
         string token = "";                   // to return processed token
         bool endToken = false;             // flag
 
-        // if index already at end of str, reset
-        if (!hasNext()) {
-            cout << "End of string reached. Resetting index to start...\n";
-            index = 0;
+        // if index already at end of str OR ignored char at end, reset
+        if (!hasNext() || ( (index == str.length() - 1) && isIgnored(str[index]) ) ) {
+            cout << "End of string reached. Call reset() to reset index.\n";
         }
 
         // check that there are still tokens to read and delimiter not found
@@ -96,6 +98,12 @@ namespace lomboy_a2 {
         return token;
     }
 
+    // Resets index to start. To be used if user wants to retiterate through tokens in str.
+    void Tokenizer::reset() {
+        index = 0;
+    }
+
+
     // Returns true if there are more characters in string from index position
     bool Tokenizer::hasNext() {
         return index < str.length(); 
@@ -127,5 +135,4 @@ namespace lomboy_a2 {
 
         return isFound;
     }
-
 }

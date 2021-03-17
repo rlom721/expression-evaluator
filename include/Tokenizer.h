@@ -6,6 +6,7 @@
 #define TOKENIZER_H
 
 #include <string>
+// #include <vector>
 namespace lomboy_a2 {
 
     class Tokenizer {
@@ -20,6 +21,7 @@ namespace lomboy_a2 {
         void setIgnores(std::string ignores);
         void returnDelims(bool tf);             // sets retDelim
         std::string getNextToken();
+        void reset();
         // Constant methods
         bool hasNext();
         std::string getStr() { return str; }
@@ -35,6 +37,7 @@ namespace lomboy_a2 {
         std::string str;
         std::string delimiters;
         std::string ignores;
+        // std::vector<std::string> tokens;
         // vector<std::string> keyWords; // parse key words...
         size_t index;         // keeps track of current string position
         bool retDelims;        // getNextToken will return delimiters

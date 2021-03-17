@@ -7,6 +7,7 @@
 //                  showing various constructors and methods.
 
 #include <iostream>
+#include <string>
 // #include <fstream>          // for reading and writing to data files
 // #include "List.h"           // testing base class
 // #include "List.cpp"           // testing base class
@@ -27,41 +28,33 @@ double evaluate(string expression);
 bool isIdentifier(string id);
 
 int main () {
-    // skips WHITESPACE... parsing reqs it...
-    Tokenizer t1;
-    t1.setStr("3 x * Y 12 - + Z -");
-    t1.setDelims(" ()+-*");
-    t1.setIgnores(" ");
+    // // skips WHITESPACE... parsing reqs it...
+    // Tokenizer t1;
+    // t1.setStr("1 7 3 * + ");
+    // t1.setDelims(" ()+-*");
+    // t1.setIgnores(" ");
 
-    cout << "str: " << t1.getStr() 
-         << "\ndelims: " << t1.getDelims() << endl;
+    // cout << "str: " << t1.getStr() 
+    //      << "\ndelims: " << t1.getDelims() << endl;
 
-    for (int i = 0; i < 11; i++) { 
-        cout  << "next token: " << t1.getNextToken() << "\n";
-            //   << (t1.getNextToken() == "" ? " (empty)": " (not empty)") 
-            //   << "\nindex: " << t1.getIndex() << "\n";
-    }
+    // for (int i = 0; i < 6; i++) 
+    //     cout  << "next token: " << t1.getNextToken() << "\n";
+    
+    // t1.reset();
+    
+    // for (int i = 0; i < 3; i++) 
+    //     cout  << "next token: " << t1.getNextToken() << "\n";
+
 
     Evaluator eval;
-    cout << eval.evaluate("1 7 3 * + ") << endl;
+    string expression = "5 4 * 3 2 * + 1 -";
+    cout << expression << " >> " << eval.evaluate(expression) << endl;
 
-    // double A = 2.0, B = 3.0, C = 4.0, D = 5.0;
-
-    // Ask for user input
-
-    // cout << "\nTesting evaluator!\n";
-    // parse from infix to postfix!
-
-    // evaluate("A B *");
-    // cout << "Yo\n";
     return 0;
 }
 
-
-
 // // This method takes a postfix expression and performs the calculation, then returns
 // // the result as a double.
-// // Assumes each parenthesis is paired and symbols are separated by spaces.
 // double evaluate(string expression) {
 //     Stack<double> nums;     // will contain operands, then final result
 //     string token = "";      // process tokens from string
