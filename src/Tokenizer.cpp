@@ -3,6 +3,7 @@
 
 #include "Tokenizer.h"
 #include <iostream>     // for cout
+#include <string>
 #include <cassert>
 using namespace std;
 namespace lomboy_a2 {
@@ -31,6 +32,11 @@ namespace lomboy_a2 {
     // Sets delimiters for parsing
     void Tokenizer::setDelims(string delims) {
         delimiters = delims;
+    }
+
+    // Sets ignores for parsing tokens
+    void Tokenizer::setIgnores(string ignores) {
+        this->ignores = ignores;
     }
 
     // Sets retDelims to true or false
@@ -69,8 +75,8 @@ namespace lomboy_a2 {
             else if (isdigit(str[index])) {
                 token += str[index++];
 
-                // if float, add decimal point and digits to token (and increment index)
-                if (str[index] == '.') {
+                // if another digit OR decimal, add it to token (and increment index)
+                if (str[index] == '.' || isdigit(str[index])) {
                     token += str[index++];
                     while (isdigit(str[index]) && hasNext()) token += str[index++];
                 }
@@ -101,6 +107,7 @@ namespace lomboy_a2 {
     }
 
     // Checks if a character is part of ignores, returns true if so
+    // ignores should be part of delims (for now!)
     bool Tokenizer::isIgnored(char c) {
         return isFound(c, ignores);
     }

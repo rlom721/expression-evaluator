@@ -7,15 +7,16 @@
 //                  showing various constructors and methods.
 
 #include <iostream>
-#include <fstream>          // for reading and writing to data files
-#include "List.h"           // testing base class
-#include "List.cpp"           // testing base class
-#include "ListItem.cpp"           // testing base class
+// #include <fstream>          // for reading and writing to data files
+// #include "List.h"           // testing base class
+// #include "List.cpp"           // testing base class
+// #include "ListItem.cpp"           // testing base class
 #include "Stack.h"          // testing derived class (parent is List class)
 #include "Stack.cpp"          // testing derived class (parent is List class)
-#include "DataClass.h"      // for producing test data
+// #include "DataClass.h"      // for producing test data
 #include <string>
-#include <Tokenizer.h>
+#include "Tokenizer.h"
+#include "Evaluator.h"
 // #include <cctype>
 // #include <math.h>
 using namespace std;
@@ -26,23 +27,11 @@ double evaluate(string expression);
 bool isIdentifier(string id);
 
 int main () {
-
-    // Tokenizer tknzr("4x y+*", " ()+-*");
-
-    // cout << "str: " << tknzr.getStr() 
-    //      << "\ndelims: " << tknzr.getDelims();
-
-    // for (int i = 0; i < 9; i++) { 
-    //     cout  << "\nnext token: " << tknzr.getNextToken() 
-    //      << "\nindex: " << tknzr.getIndex();
-    // }
-
-    // cout << endl;
-
-    cout << "Next Tokenizer...\n";
+    // skips WHITESPACE... parsing reqs it...
     Tokenizer t1;
-    t1.setStr("4x sin( cosy+*");
+    t1.setStr("3 x * Y 12 - + Z -");
     t1.setDelims(" ()+-*");
+    t1.setIgnores(" ");
 
     cout << "str: " << t1.getStr() 
          << "\ndelims: " << t1.getDelims() << endl;
@@ -52,6 +41,9 @@ int main () {
             //   << (t1.getNextToken() == "" ? " (empty)": " (not empty)") 
             //   << "\nindex: " << t1.getIndex() << "\n";
     }
+
+    Evaluator eval;
+    cout << eval.evaluate("1 7 3 * + ") << endl;
 
     // double A = 2.0, B = 3.0, C = 4.0, D = 5.0;
 

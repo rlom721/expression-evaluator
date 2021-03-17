@@ -352,12 +352,12 @@ namespace lomboy_a2 {
         // iterate through again to show keys
         listItemType* listPtr = headPtr;
 
-        // cout << "KEY:   ";
-        // while (listPtr != nullptr) {
-        //     cout << "(" << listPtr->getKey() << ")  ";
-        //     listPtr = listPtr->getNext();
-        // }
-        // cout << endl;
+        cout << "KEY:   ";
+        while (listPtr != nullptr) {
+            cout << "(" << listPtr->getKey() << ")  ";
+            listPtr = listPtr->getNext();
+        }
+        cout << endl;
 
         listPtr = nullptr;
     }

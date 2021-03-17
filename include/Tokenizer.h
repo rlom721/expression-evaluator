@@ -21,12 +21,13 @@ namespace lomboy_a2 {
         void returnDelims(bool tf);             // sets retDelim
         std::string getNextToken();
         // Constant methods
+        bool hasNext();
         std::string getStr() { return str; }
         std::string getDelims() { return delimiters; }
+        std::string getIgnores() { return ignores; }
         // size_t getIndex() { return index; }
     private:
         // Helper functions
-        bool hasNext();
         bool isDelim(char c); 
         bool isIgnored(char c); 
         bool isFound(char c, std::string chars); 
