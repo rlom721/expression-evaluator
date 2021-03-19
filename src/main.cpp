@@ -15,12 +15,19 @@
 using namespace std;
 using namespace lomboy_a2;
 
+// NO SUPPORT FOR NEG CONSTANTS SHIT
+
 int main () {
     Evaluator eval;
-    string expression = "5 4 * 3 2 * + 1 -";
+    string expression = "x 5 4 * 3 2 * + 1 - =";
     cout << expression << " >> " << eval.evaluate(expression) << endl;
-    cout << "1 7 + 5 *" << " >> " << eval.evaluate("1 7 + 5 *") << endl;
-    cout << "1 A + 5 *" << " >> " << eval.evaluate("1 A + 5 *") << endl;
+    cout << "y A B 1.5 * + C D / - =" << " >> " 
+        << eval.evaluate("y A B 1.5 * + C D / - =") << endl;
+    cout << "w x sqrt =" << " >> " << eval.evaluate("w x sqrt =") << endl;
+    cout << "z x sin =" << " >> " << eval.evaluate("z x sin =") << endl;
+    cout << "v -8.7 =" << " >> " << eval.evaluate("v -8.7 =") << endl;
+    cout << "v -8.7 aBs =" << " >> " << eval.evaluate("v -8.7 aBs =") << endl;
+    // cout << "1 A + 5 *" << " >> " << eval.evaluate("1 A + 5 *") << endl;
 
      // eval.showSymTable();
 

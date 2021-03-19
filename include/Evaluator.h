@@ -37,8 +37,8 @@ namespace lomboy_a2 {
         enum class ParseAction { S1, S2, ERR, U2, UC };
         // Helper functions
         ParseAction getAction(std::string tk);
-        bool isIdentifier();    // SymbolTable lookup
-        bool isBinaryOp();      // SymbolTable lookup
+        bool isVar(string tk);    // SymbolTable lookup
+        bool isUnaryOp(string tk);      
         // Member variables
         Tokenizer tknr;
         Stack<string> s1;    // temp holds operands, then final postfix format

@@ -20,8 +20,8 @@ namespace lomboy_a2 {
     // Default constructor sets values to defaults (such as delimiters for tokenizer)
     // and inserts predefined variable values into symbol table
     Evaluator::Evaluator() : tknr("", " ()-+/*="), hasFloat(true) { 
-        vars.insertToHT("A", "5");
-        vars.insertToHT("B", "10");
+        vars.insertToHT("A", "10");
+        vars.insertToHT("B", "5");
         vars.insertToHT("C", "-1");
         vars.insertToHT("D", "2");
     }
@@ -29,8 +29,8 @@ namespace lomboy_a2 {
     // Parametrized constructor sets member variables to arguments 
     Evaluator::Evaluator(string str, string delims) 
         : tknr("", " ()-+/*="), hasFloat(true)  { 
-        vars.insertToHT("A", "5");
-        vars.insertToHT("B", "10");
+        vars.insertToHT("A", "10");
+        vars.insertToHT("B", "5");
         vars.insertToHT("C", "-1");
         vars.insertToHT("D", "2");
     }
@@ -51,24 +51,34 @@ namespace lomboy_a2 {
     // Assumes each parenthesis is paired and symbols are separated by spaces.
     double Evaluator::evaluate(string expression) {
         Stack<double> nums;             // initially holds operands, then final result           
-        string token;                   // current token being processed
-        double op1 = 0.0, op2 = 0.0;    // operands for calculation
+        string token,                   // current token being processed
+               resultKey;               // for variable assignment
+        double op1 = 0.0, op2 = 0.0,    // operands for calculation
+               result = 0.0;            // final result of expression
         tknr.setStr(expression);        // to get tokens
 
         // loop while there are still tokens to get from string
         while (tknr.hasNext()) {
+            // nums.showStack();            // FOR DEGUGGING
             token = tknr.getNextToken();
 
-            // number is a 
+            // token is a constant number
             if (isdigit(token[0])) {
                 nums.push(stod(token));
             }
-            // else if (getAction(token) == S1) // identifier {
-                // look up action
-            // }
-            // if operator, perform calculation CHECK SIN, COS...
-            // && lowercase(token) != "sin"...) {  // if token not empty CHECK IF OPERATOR!
-            else if (token != "\0") {
+            // token is a valid variable/identifier (starts with a letter) AND not unary op
+            else if (isalpha(token[0]) && !isUnaryOp(token)) {
+                // if predefined variable, retrieve its value and push to nums
+                // else, define variable to assign result later
+                if (isVar(token))
+                    nums.push(stod(vars.getValue(token)));
+                else {
+                    resultKey = token;
+                    // vars.insertToHT(resultKey, "EMPTY");
+                }
+            }
+            // if binary operator, perform calculation
+            else if (token == "*" || token == "/" || token == "+" || token == "-") {
                 op2 = nums.pop();   // get operands
                 op1 = nums.pop();
 
@@ -85,16 +95,35 @@ namespace lomboy_a2 {
                 else if (token == "-") {
                     nums.push(op1 - op2);
                 }
-                // else if (lowercase(token) == "sin") {
-                //     nums.push(op1 - op2);
-                // }
-                // add cases for sin , cos, sqrt, abs
             }
+            // if unary op, perform calculation (also check its not empty or string with null)
+            else if (isUnaryOp(token)) {
+                op1 = nums.pop();   // get operand
 
+                // perform calculation based on operator, push result back to stack
+                if (lowercase(token) == "sin") {
+                    nums.push(sin(op1));
+                }
+                else if (lowercase(token) == "cos") {
+                    nums.push(cos(op1));
+                }
+                else if (lowercase(token) == "sqrt") {
+                    nums.push(sqrt(op1));
+                }
+                else if (lowercase(token) == "abs") {
+                    nums.push(abs(op1));
+                }
+            }
+            // if assignment operator, then pop result from stack and assign to variable
+            // used as resultKey (the first identifier encountered)
+            else if (token == "=") {
+                result = nums.pop();
+                vars.insertToHT(resultKey, to_string(result));
+            }
         }
 
         // final and only item in stack is result
-        return nums.pop();
+        return result;
     } 
 
     // This method takes an expression in infix form and returns it as a postfix.
@@ -118,7 +147,7 @@ namespace lomboy_a2 {
             // check if valid identifier name, then push to stack
             else if (isalpha(token[0]) ) { // check in getAction instead?
                 // if token NOT in Symbol Table, insert it ! FIX for personal var assn
-                // if (!isOperand(token)) vars.insertToHT(token, ???);
+                // if (!isVar(token)) vars.insertToHT(token, ???);
                 s1.push(token);
             }
             // print error message
@@ -146,12 +175,21 @@ namespace lomboy_a2 {
         // return
     }
 
-    bool Evaluator::isOperand(string tk) {
+    // Search symbol table to determine if token is predefined variable, 
+    // then return true if found
+    bool Evaluator::isVar(string tk) {
         return vars.findRecord(tk);
     }
 
-    // bool Evaluator::isOperator(string tk)
+    // returns true if operator is sin, cos, sqrt or abs
+    bool Evaluator::isUnaryOp(string tk) {
+        string lowerTk = lowercase(tk);
+        
+        return lowerTk == "sin" || lowerTk == "cos" || lowerTk == "sqrt" 
+               || lowerTk == "abs";
+    }
 
+    // ADD UNARY CHAR SUPPORT
     // This helper function returns a code corresponding to an action based on the current
     // state of member Stack operators. (Implementation based on parse table.)
     // Argument passed is a token from evaluate().
@@ -160,7 +198,7 @@ namespace lomboy_a2 {
         ParseAction nextAction;     // to return action code
 
         // token is operand (column <identifier>)
-        if (isOperand(token)) {
+        if (isVar(token)) {
             nextAction = ParseAction::S1;
         }
         // token is = operator
