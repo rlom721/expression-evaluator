@@ -14,26 +14,17 @@
 #include <vector>       // main table structure
 using namespace std;
 
-// template <class data>
 class Hashtable {
-  // typedef
-  // typedef data dataType;
 public:
   // Constructors
   Hashtable();
   // Modification methods
   void insertToHT(string entryKey, string entryData);
-  void hashRecords(string dataFileName);
-  void restoreHTtoMem();
   void resetHT();
   // Constant methods
   string getValue(string key);
-  // bool findRecord(string key);
+  bool findRecord(string key);
   void GenStatReport();
-  void writeHTtoDisk();
-  void ReportHT(string reportFileName, string reportName);
-  void SearchHT(string searchFileName);
-  void collisionReport();
   int size() const { return buckets.size(); }
   int numEntries() const;
 private:

@@ -2,7 +2,7 @@
 // File name: Evaluator.cpp
 
 #include "Evaluator.h"
-// #include "SymbolTable.h"
+// #include "Hashtable.h"
 #include "Tokenizer.h"
 #include "Stack.h"          // for evaluating postfix expression
 #include "Stack.cpp"
@@ -18,65 +18,37 @@ using namespace std;
 namespace lomboy_a2 {
 
     // Default constructor sets values to defaults (such as delimiters for tokenizer)
-    Evaluator::Evaluator() : tknr("", " ()-+/*="), hasFloat(true) { }
+    // and inserts predefined variable values into symbol table
+    Evaluator::Evaluator() : tknr("", " ()-+/*="), hasFloat(true) { 
+        vars.insertToHT("A", "5");
+        vars.insertToHT("B", "10");
+        vars.insertToHT("C", "-1");
+        vars.insertToHT("D", "2");
+    }
 
     // Parametrized constructor sets member variables to arguments 
     Evaluator::Evaluator(string str, string delims) 
-        : tknr("", " ()-+/*="), hasFloat(true)  { }
+        : tknr("", " ()-+/*="), hasFloat(true)  { 
+        vars.insertToHT("A", "5");
+        vars.insertToHT("B", "10");
+        vars.insertToHT("C", "-1");
+        vars.insertToHT("D", "2");
+    }
 
     // Copy constructor copies member variables
     Evaluator::Evaluator(const Evaluator& eval) {
         tknr = eval.tknr;
         hasFloat = eval.hasFloat;
+        operators = eval.operators;
+        vars.insertToHT("A", "5");
+        vars.insertToHT("B", "10");
+        vars.insertToHT("C", "-1");
+        vars.insertToHT("D", "2");
     }
 
-    // // This method converts an expression from infix to postfix format and returns it.
-    // string Evaluator::infixToPostfix(string expression) { 
-    //     Stack<string> s1;          // temp holds operands, then final postfix format
-    //     string token;               // current token
-    //     tknr.setStr(expression);    // get tokens
-
-    //     // loop while there are still tokens to read
-    //     while (tknr.hasNext()) {
-    //         token = tknr.getNextToken();
-
-    //         // check if valid identifier name, then push to stack
-    //         if (isalpha(token[0])) {
-    //             // if token NOT in Symbol Table 
-    //                 // insert to table
-    //             s1.push(token);
-    //         }
-    //         // if simply a number
-    //         else if (isdigit(token[0])) {
-    //             s1.push(token);
-    //         }
-    //         // print error message
-    //         else if (getAction(token) == Err) {
-    //             cout << "Error! Invalid expression.";
-    //         }
-    //         // push token to operators stack member
-    //         else if (getAction(token) == S2) {
-    //             operators.push(token);
-    //         }
-    //         // // pop operators and push to s1, then compare again
-    //         // else if (getAction(token) == U1) {
-    //             // << IMPLEMENT WITHIN getAction() >>
-    //         // }
-    //         else if (getAction(token) == U2) {
-
-    //         }
-    //         else if (getAction(token) == Uc) {
-            
-    //         }
-    //     }
-
-    //     // return
-    // }
-
-    // This method takes a string in POSTFIX format and calculates then returns the
+    // This method takes a string in postfix format and calculates then returns the
     // result as a double. 
     // Assumes each parenthesis is paired and symbols are separated by spaces.
-    // hmm can be int tho... ADD int or float check? another method tho lol
     double Evaluator::evaluate(string expression) {
         Stack<double> nums;             // initially holds operands, then final result           
         string token;                   // current token being processed
@@ -86,10 +58,8 @@ namespace lomboy_a2 {
         // loop while there are still tokens to get from string
         while (tknr.hasNext()) {
             token = tknr.getNextToken();
-            // nums.showStack();   // for debugging
 
-            // push operands onto stack (convert to double)
-            // OR OPERAND
+            // number is a 
             if (isdigit(token[0])) {
                 nums.push(stod(token));
             }
@@ -127,15 +97,115 @@ namespace lomboy_a2 {
         return nums.pop();
     } 
 
-    // bool Evaluator::isOperand(string tk)
+    // This method takes an expression in infix form and returns it as a postfix.
+    string Evaluator::infixToPostfix(string expression) { 
+        Stack<string> s1;           // temp holds operands, then final postfix format
+        string token;               // current token
+        tknr.setStr(expression);    // get tokens
+
+        // loop while there are still tokens to read
+        while (tknr.hasNext()) {
+            token = tknr.getNextToken();
+
+            // if simply a constant number
+            if (isdigit(token[0])) {
+                s1.push(token);
+            }
+            // check if unary operator name !!! CHECK LOGIC
+            else if (lowercase(token) == "sin" || lowercase(token) == "cos" 
+                     || lowercase(token) == "sqrt" || lowercase(token) == "abs") {
+                s1.push(token);
+            }
+            // check if valid identifier name, then push to stack
+            else if (isalpha(token[0]) ) { // check in getAction instead?
+                // if token NOT in Symbol Table, insert it ! FIX for personal var assn
+                // if (!isOperand(token)) vars.insertToHT(token, ???);
+                s1.push(token);
+            }
+            // print error message
+            else if (getAction(token) == ParseAction::ERR) {
+                cout << "Error! Invalid expression.";
+            }
+            // push token to operators stack member
+            else if (getAction(token) == ParseAction::S2) {
+                operators.push(token);
+            }
+            // // pop operators and push to s1, then compare again
+            // else if (getAction(token) == U1) {
+                // << IMPLEMENT WITHIN getAction() >>
+            // }
+            // unstack operators to s1 until "(" is found then discard "("
+            else if (getAction(token) == ParseAction::U2) {
+                // while ()
+            }
+            // unstack operators to s1 until operators is empty
+            else if (getAction(token) == ParseAction::UC) {
+            
+            }
+        }
+
+        // return
+    }
+
+    bool Evaluator::isOperand(string tk) {
+        return vars.findRecord(tk);
+    }
 
     // bool Evaluator::isOperator(string tk)
 
     // This helper function returns a code corresponding to an action based on the current
     // state of member Stack operators. (Implementation based on parse table.)
     // Argument passed is a token from evaluate().
-    Evaluator::ParseAction Evaluator::getAction(string tk) {
-        // if (tk.isOperand())
+    Evaluator::ParseAction Evaluator::getAction(string token) {
+        ParseAction nextAction;     // to return action code
+
+        // token is operand (column <identifier>)
+        if (isOperand(token)) {
+            nextAction = ParseAction::S1;
+        }
+        // token is = operator
+        else if (token == "=") {
+            if (operators.isEmpty()) nextAction = ParseAction::S2;
+            else nextAction = ParseAction::ERR;
+        }
+        // token is + or - operator
+        else if (token == "+" || token == "-") {
+            if (operators.isEmpty()) 
+                nextAction = ParseAction::ERR;
+            else if (operators.showTop() == "=" || operators.showTop() == "(") 
+                nextAction = ParseAction::S2;
+            else if (operators.showTop() == "+" || operators.showTop() == "-"
+                     || operators.showTop() == "*" || operators.showTop() == "/") 
+                nextAction = ParseAction::U1;
+        }
+        // token is * or / operator
+        else if (token == "*" || token == "/") {
+            if (operators.isEmpty()) 
+                nextAction = ParseAction::ERR;
+            else if (operators.showTop() == "=" || operators.showTop() == "+" 
+                     || operators.showTop() == "-" || operators.showTop() == "(") 
+                nextAction = ParseAction::S2;
+            else if (operators.showTop() == "*" || operators.showTop() == "/")
+                nextAction = ParseAction::U1;
+        }
+        // token is ( operator
+        else if (token == "(") {
+            if (operators.isEmpty()) nextAction = ParseAction::ERR;
+            else nextAction = ParseAction::S2;
+        }
+        // token is ) operator
+        else if (token == ")") {
+            if (operators.isEmpty() || operators.showTop() == "=") 
+                nextAction = ParseAction::ERR;
+            else nextAction = ParseAction::UC;
+        }
+        // add case if token is unary??????
+        // token is empty string or null char
+        else if (token == "\0" || token == "") {
+            nextAction = ParseAction::U2;
+        }
+
+        return nextAction;
     }
 
     // Converts a string to lowercase char by char
@@ -153,14 +223,8 @@ namespace lomboy_a2 {
         return lowercase;
     }
 
-    void Evaluator::showStack() {
-        cout << operators << endl;
-    }
-
-    void Evaluator::test() {
-        cout << "Testing Stack member: \n";
-        operators.push("Trust");
-        operators.push("I");
-        operators.push("Men");
+    // EVERTHING BELOW THIS WILL BE DELETED AFTER TESTING
+    void Evaluator::showSymTable() {
+        vars.GenStatReport();
     }
 }
