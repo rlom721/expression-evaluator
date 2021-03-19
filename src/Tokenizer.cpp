@@ -67,7 +67,11 @@ namespace lomboy_a2 {
             // if delimiter and set to be tokenized, add to token, increment count and set flag
             // else if not returnDelim, skip (by not ending token)
             if (isDelim(str[index])) {
-                if(retDelims && !isIgnored(str[index])) {
+                // "-" symbol could be negative sign, so check if next char is a number
+                if (str[index] == '-' && isdigit(str[index+1])) {
+                    token += str[index];
+                }
+                else if(retDelims && !isIgnored(str[index])) {
                     token += str[index];
                     endToken = true;
                 }

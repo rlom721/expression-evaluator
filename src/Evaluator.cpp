@@ -62,8 +62,8 @@ namespace lomboy_a2 {
             // nums.showStack();            // FOR DEGUGGING
             token = tknr.getNextToken();
 
-            // token is a constant number
-            if (isdigit(token[0])) {
+            // token is a constant number (check for negative number too)
+            if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
                 nums.push(stod(token));
             }
             // token is a valid variable/identifier (starts with a letter) AND not unary op

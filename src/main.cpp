@@ -15,9 +15,13 @@
 using namespace std;
 using namespace lomboy_a2;
 
-// NO SUPPORT FOR NEG CONSTANTS SHIT
-
 int main () {
+    Tokenizer tknr;
+
+    tknr.setStr(" y = -8.7 ");
+    while (tknr.hasNext())
+        cout << tknr.getNextToken() << endl;
+
     Evaluator eval;
     string expression = "x 5 4 * 3 2 * + 1 - =";
     cout << expression << " >> " << eval.evaluate(expression) << endl;
