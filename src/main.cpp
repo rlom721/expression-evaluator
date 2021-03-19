@@ -12,14 +12,12 @@
 // #include "List.h"           // testing base class
 // #include "List.cpp"           // testing base class
 // #include "ListItem.cpp"           // testing base class
-#include "Stack.h"          // testing derived class (parent is List class)
-#include "Stack.cpp"          // testing derived class (parent is List class)
-// #include "DataClass.h"      // for producing test data
+// #include "Stack.h"          // testing derived class (parent is List class)
+// #include "Stack.cpp"          // testing derived class (parent is List class)
 #include <string>
 #include "Tokenizer.h"
 #include "Evaluator.h"
-// #include <cctype>
-// #include <math.h>
+#include <math.h>
 using namespace std;
 using namespace lomboy_a2;
 
@@ -49,6 +47,26 @@ int main () {
     Evaluator eval;
     string expression = "5 4 * 3 2 * + 1 -";
     cout << expression << " >> " << eval.evaluate(expression) << endl;
+    cout << "1 7 + 5 *" << " >> " << eval.evaluate("1 7 + 5 *") << endl;
+    cout << "1 A + 5 *" << " >> " << eval.evaluate("1 A + 5 *") << endl;
+
+    cout << "a - z: " << int('a') << "-" << int('z') << '\n'
+         << "A - Z: " << int('A') << "-" << int('Z') << '\n';
+
+    string word = "COS";
+    cout << "Converting " << word << " to lower: " 
+         << eval.lowercase(word) << endl;
+    cout << eval.lowercase("HEY ADORA") << endl;
+
+    cout << "Math: \n" << "|-7| = " << abs(-7)
+         << "\nsin(0) = " << sin(0)
+         << "\nsqrt(16)) = " << sqrt(16)
+         << "\nM_PI = " << M_PI
+         << "\nsin(M_PI) = " << sin(M_PI)
+         << "\nsin(M_PI/4) = " << sin(M_PI/4) << endl;
+    // eval.showStack();
+    // eval.test();
+    // eval.showStack();
 
     return 0;
 }

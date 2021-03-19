@@ -5,7 +5,6 @@
 #ifndef LISTITEM_H
 #define LISTITEM_H
 
-#include "DataClass.h"    // header file for ListItem class
 #include <iostream>
 namespace lomboy_a2 {
 

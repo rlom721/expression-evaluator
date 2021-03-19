@@ -26,9 +26,10 @@ namespace lomboy_a2 {
         // tokens = tkn.tokens;
     }
 
-    // Sets str member to be tokenized
+    // Sets str member to be tokenized and reset index
     void Tokenizer::setStr(string str) {
         this->str = str;
+        reset();
     }
 
     // Sets delimiters for parsing
