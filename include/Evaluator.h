@@ -34,13 +34,14 @@ namespace lomboy_a2 {
         std::string infixToPostfix(std::string expression);
     private:
         // enum - action codes for converting to postfix
-        enum class ParseAction { S1, S2, ERR, U1, U2, UC };
+        enum class ParseAction { S1, S2, ERR, U2, UC };
         // Helper functions
         ParseAction getAction(std::string tk);
         bool isIdentifier();    // SymbolTable lookup
         bool isBinaryOp();      // SymbolTable lookup
         // Member variables
         Tokenizer tknr;
+        Stack<string> s1;    // temp holds operands, then final postfix format
         Stack<std::string> operators;
         SymbolTable vars;    // stores variables and data
         bool hasFloat;          // flag to return int or double

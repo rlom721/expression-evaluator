@@ -99,7 +99,6 @@ namespace lomboy_a2 {
 
     // This method takes an expression in infix form and returns it as a postfix.
     string Evaluator::infixToPostfix(string expression) { 
-        Stack<string> s1;           // temp holds operands, then final postfix format
         string token;               // current token
         tknr.setStr(expression);    // get tokens
 
@@ -156,6 +155,7 @@ namespace lomboy_a2 {
     // This helper function returns a code corresponding to an action based on the current
     // state of member Stack operators. (Implementation based on parse table.)
     // Argument passed is a token from evaluate().
+    // add case if token is unary??????
     Evaluator::ParseAction Evaluator::getAction(string token) {
         ParseAction nextAction;     // to return action code
 
@@ -175,8 +175,11 @@ namespace lomboy_a2 {
             else if (operators.showTop() == "=" || operators.showTop() == "(") 
                 nextAction = ParseAction::S2;
             else if (operators.showTop() == "+" || operators.showTop() == "-"
-                     || operators.showTop() == "*" || operators.showTop() == "/") 
-                nextAction = ParseAction::U1;
+                     || operators.showTop() == "*" || operators.showTop() == "/") {
+                // have to do another comparison
+                s1.push(operators.pop());
+                getAction(token);   // recursive call 
+            }
         }
         // token is * or / operator
         else if (token == "*" || token == "/") {
@@ -185,8 +188,11 @@ namespace lomboy_a2 {
             else if (operators.showTop() == "=" || operators.showTop() == "+" 
                      || operators.showTop() == "-" || operators.showTop() == "(") 
                 nextAction = ParseAction::S2;
-            else if (operators.showTop() == "*" || operators.showTop() == "/")
-                nextAction = ParseAction::U1;
+            else if (operators.showTop() == "*" || operators.showTop() == "/") {
+                // have to do another comparison
+                s1.push(operators.pop());
+                getAction(token);   // recursive call 
+            }
         }
         // token is ( operator
         else if (token == "(") {
@@ -199,7 +205,6 @@ namespace lomboy_a2 {
                 nextAction = ParseAction::ERR;
             else nextAction = ParseAction::UC;
         }
-        // add case if token is unary??????
         // token is empty string or null char
         else if (token == "\0" || token == "") {
             nextAction = ParseAction::U2;
