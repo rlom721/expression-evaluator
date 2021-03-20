@@ -128,7 +128,8 @@ namespace lomboy_a2 {
 
     // This method takes an expression in infix form and returns it as a postfix.
     string Evaluator::infixToPostfix(string expression) { 
-        string postfix = "";        // contains postfix format
+        string postfix;
+        Stack<string> tempStack;         // for popping to get postfix result
         string token;               // current token
         ParseAction action;         // enum code determines action for a token
         string temp;                // to throw away char "("
@@ -141,8 +142,8 @@ namespace lomboy_a2 {
 
             // S1 code means stack input token to s1 stack
             if (action == ParseAction::S1) {
-                // s1.push(token);
-                postfix += " " + token;
+                s1.push(token);
+                // postfix += " " + token;
             }
             // S2 code means stack input token to s2 stack
             else if (action == ParseAction::S2) {
@@ -153,21 +154,29 @@ namespace lomboy_a2 {
                 cout << "Error! Invalid expression.";
             }
             // unstack operators to s1 until "(" is found then discard "("
-            else if (action == ParseAction::U2) {
+            else if (action == ParseAction::UC) {
                 while (operators.showTop() != "(") 
-                    postfix += " " + operators.pop();// s1.push(operators.pop());
+                    s1.push(operators.pop());
                 temp = operators.pop();
             }
-            // unstack operators to s1 until operators is empty
-            else if (action == ParseAction::UC) {
+            // unstack operators to s1 until "(" is found
+            else if (action == ParseAction::U2) {
                 while (!operators.isEmpty())
-                    postfix += " " + operators.pop();
+                    s1.push(operators.pop());
             }
         }
 
         // unstack operators to s1 until operators is empty
         while (!operators.isEmpty())
-            postfix += " " + operators.pop();
+            s1.push(operators.pop());
+            // postfix += " " + operators.pop();
+
+        // push contents of s1 to a temp stack, then pop to get postfix
+        while (!s1.isEmpty())
+            tempStack.push(s1.pop());
+
+        while (!tempStack.isEmpty())
+            postfix += " " + tempStack.pop();
 
         return postfix;
     }
@@ -180,8 +189,15 @@ namespace lomboy_a2 {
     Evaluator::ParseAction Evaluator::getAction(string token) {
         ParseAction nextAction;     // to return action code
 
+        // input token is a unary operator
+        if (isUnaryOp(token)) {
+            if (operators.isEmpty()) 
+                nextAction = ParseAction::ERR;
+            else 
+                nextAction = ParseAction::S2;
+        }
         // input token is a valid variable name or numeric constant
-        if (isalpha(token[0]) || isNum(token)) {
+        else if (isalpha(token[0]) || isNum(token)) {
             nextAction = ParseAction::S1;
         }
         // input token is = operator
@@ -202,7 +218,7 @@ namespace lomboy_a2 {
                      || isUnaryOp(operators.showTop()) ) {
                 // have to do another comparison
                 s1.push(operators.pop());
-                getAction(token);   // recursive call 
+                nextAction = getAction(token);   // recursive call 
             }
         }
         // input token is * or / operator
@@ -216,7 +232,7 @@ namespace lomboy_a2 {
                      || isUnaryOp(operators.showTop()) ) {
                 // have to do another comparison
                 s1.push(operators.pop());
-                getAction(token);   // recursive call 
+                nextAction = getAction(token);   // recursive call 
             }
         }
         // input token is ( operator
@@ -232,13 +248,6 @@ namespace lomboy_a2 {
                 nextAction = ParseAction::ERR;
             else 
                 nextAction = ParseAction::UC;
-        }
-        // input token is a unary operator
-        else if (isUnaryOp(token)) {
-            if (operators.isEmpty()) 
-                nextAction = ParseAction::ERR;
-            else 
-                nextAction = ParseAction::S2;
         }
         // input token is empty string or null char
         else if (token == "\0" || token == "") {

@@ -20,6 +20,9 @@ int main () {
     Evaluator eval;
 
     cout << eval.infixToPostfix("y = 7 + 8") << endl;
+    cout << eval.infixToPostfix("y = a + b / c * d") << endl;
+    cout << eval.infixToPostfix("y = a + 5.0 / 1 * d") << endl;
+    cout << eval.infixToPostfix("y = sin( a - b ) / cos (c + d)") << endl;
     // eval.testGetAction();
     // string expression = "x 5 4 * 3 2 * + 1 - =";
     // cout << expression << " >> " << eval.evaluate(expression) << endl;
