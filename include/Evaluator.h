@@ -28,10 +28,10 @@ namespace lomboy_a2 {
         // Constant methods
         bool isOperand(string tk);
         void showSymTable();
-
         std::string lowercase(std::string word);
-        void test();            // testing
         std::string infixToPostfix(std::string expression);
+        // FOR TESTING ONLY
+        void test();
     private:
         // enum - action codes for converting to postfix
         enum class ParseAction { S1, S2, ERR, U2, UC };
@@ -39,10 +39,11 @@ namespace lomboy_a2 {
         ParseAction getAction(std::string tk);
         bool isVar(string tk);    // SymbolTable lookup
         bool isUnaryOp(string tk);      
+        bool isNum(string tk);      
         // Member variables
         Tokenizer tknr;
         Stack<string> s1;    // temp holds operands, then final postfix format
-        Stack<std::string> operators;
+        Stack<std::string> operators;   // used in getAction and postfix conversion
         SymbolTable vars;    // stores variables and data
         bool hasFloat;          // flag to return int or double
     };

@@ -162,7 +162,7 @@ void Hashtable::insertToHT(string entryKey, string entryData, int index) {
 int Hashtable::hashFunc(string key) const {
   int sum;
   
-  for (int i = 0; i < key.length(); i++)
+  for (size_t i = 0; i < key.length(); i++)
     sum += key[0];
   //  int sum = key[2] + key[4] + key[6];
 

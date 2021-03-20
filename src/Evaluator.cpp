@@ -128,51 +128,139 @@ namespace lomboy_a2 {
 
     // This method takes an expression in infix form and returns it as a postfix.
     string Evaluator::infixToPostfix(string expression) { 
+        string postfix = "";        // contains postfix format
         string token;               // current token
+        ParseAction action;         // enum code determines action for a token
+        string temp;                // to throw away char "("
         tknr.setStr(expression);    // get tokens
 
         // loop while there are still tokens to read
         while (tknr.hasNext()) {
             token = tknr.getNextToken();
+            action = getAction(token);
 
-            // if simply a constant number
-            if (isdigit(token[0])) {
-                s1.push(token);
+            // S1 code means stack input token to s1 stack
+            if (action == ParseAction::S1) {
+                // s1.push(token);
+                postfix += " " + token;
             }
-            // check if unary operator name !!! CHECK LOGIC
-            else if (lowercase(token) == "sin" || lowercase(token) == "cos" 
-                     || lowercase(token) == "sqrt" || lowercase(token) == "abs") {
-                s1.push(token);
-            }
-            // check if valid identifier name, then push to stack
-            else if (isalpha(token[0]) ) { // check in getAction instead?
-                // if token NOT in Symbol Table, insert it ! FIX for personal var assn
-                // if (!isVar(token)) vars.insertToHT(token, ???);
-                s1.push(token);
-            }
-            // print error message
-            else if (getAction(token) == ParseAction::ERR) {
-                cout << "Error! Invalid expression.";
-            }
-            // push token to operators stack member
-            else if (getAction(token) == ParseAction::S2) {
+            // S2 code means stack input token to s2 stack
+            else if (action == ParseAction::S2) {
                 operators.push(token);
             }
-            // // pop operators and push to s1, then compare again
-            // else if (getAction(token) == U1) {
-                // << IMPLEMENT WITHIN getAction() >>
-            // }
+            // ERR code means error and invalid input
+            else if (action == ParseAction::ERR) {
+                cout << "Error! Invalid expression.";
+            }
             // unstack operators to s1 until "(" is found then discard "("
-            else if (getAction(token) == ParseAction::U2) {
-                // while ()
+            else if (action == ParseAction::U2) {
+                while (operators.showTop() != "(") 
+                    postfix += " " + operators.pop();// s1.push(operators.pop());
+                temp = operators.pop();
             }
             // unstack operators to s1 until operators is empty
-            else if (getAction(token) == ParseAction::UC) {
-            
+            else if (action == ParseAction::UC) {
+                while (!operators.isEmpty())
+                    postfix += " " + operators.pop();
             }
         }
 
-        // return
+        // unstack operators to s1 until operators is empty
+        while (!operators.isEmpty())
+            postfix += " " + operators.pop();
+
+        return postfix;
+    }
+
+    // ADD UNARY CHAR SUPPORT and... constant?
+    // This helper function returns a code corresponding to an action based on the current
+    // state of member Stack operators. (Implementation based on parse table.)
+    // Argument passed is a token from evaluate().
+    // add case if token is unary??????
+    Evaluator::ParseAction Evaluator::getAction(string token) {
+        ParseAction nextAction;     // to return action code
+
+        // input token is a valid variable name or numeric constant
+        if (isalpha(token[0]) || isNum(token)) {
+            nextAction = ParseAction::S1;
+        }
+        // input token is = operator
+        else if (token == "=") {
+            if (operators.isEmpty()) 
+                nextAction = ParseAction::S2;
+            else 
+                nextAction = ParseAction::ERR;
+        }
+        // input token is + or - operator
+        else if (token == "+" || token == "-") {
+            if (operators.isEmpty()) 
+                nextAction = ParseAction::ERR;
+            else if (operators.showTop() == "=" || operators.showTop() == "(") 
+                nextAction = ParseAction::S2;
+            else if (operators.showTop() == "+" || operators.showTop() == "-" 
+                     || operators.showTop() == "*" || operators.showTop() == "/" 
+                     || isUnaryOp(operators.showTop()) ) {
+                // have to do another comparison
+                s1.push(operators.pop());
+                getAction(token);   // recursive call 
+            }
+        }
+        // input token is * or / operator
+        else if (token == "*" || token == "/") {
+            if (operators.isEmpty()) 
+                nextAction = ParseAction::ERR;
+            else if (operators.showTop() == "=" || operators.showTop() == "+" 
+                     || operators.showTop() == "-" || operators.showTop() == "(") 
+                nextAction = ParseAction::S2;
+            else if (operators.showTop() == "*" || operators.showTop() == "/" 
+                     || isUnaryOp(operators.showTop()) ) {
+                // have to do another comparison
+                s1.push(operators.pop());
+                getAction(token);   // recursive call 
+            }
+        }
+        // input token is ( operator
+        else if (token == "(") {
+            if (operators.isEmpty()) 
+                nextAction = ParseAction::ERR;
+            else 
+                nextAction = ParseAction::S2;
+        }
+        // input token is ) operator
+        else if (token == ")") {
+            if (operators.isEmpty() || operators.showTop() == "=") 
+                nextAction = ParseAction::ERR;
+            else 
+                nextAction = ParseAction::UC;
+        }
+        // input token is a unary operator
+        else if (isUnaryOp(token)) {
+            if (operators.isEmpty()) 
+                nextAction = ParseAction::ERR;
+            else 
+                nextAction = ParseAction::S2;
+        }
+        // input token is empty string or null char
+        else if (token == "\0" || token == "") {
+            nextAction = ParseAction::U2;
+        }
+
+        return nextAction;
+    }
+
+    // Helper method converts a string to lowercase char by char
+    string Evaluator::lowercase(std::string word) {
+        string lowercase = "";
+
+        for (size_t ch = 0; ch < word.length(); ch++) {
+            // check if char is uppercase, then convert by adding (ASCII code difference)
+            if (word[ch] >= 'A' && word[ch] <= 'Z')
+                lowercase += word[ch] + ('a' - 'A');
+            else   
+                lowercase += word[ch];
+        }
+
+        return lowercase;
     }
 
     // Search symbol table to determine if token is predefined variable, 
@@ -189,85 +277,19 @@ namespace lomboy_a2 {
                || lowerTk == "abs";
     }
 
-    // ADD UNARY CHAR SUPPORT
-    // This helper function returns a code corresponding to an action based on the current
-    // state of member Stack operators. (Implementation based on parse table.)
-    // Argument passed is a token from evaluate().
-    // add case if token is unary??????
-    Evaluator::ParseAction Evaluator::getAction(string token) {
-        ParseAction nextAction;     // to return action code
-
-        // token is operand (column <identifier>)
-        if (isVar(token)) {
-            nextAction = ParseAction::S1;
-        }
-        // token is = operator
-        else if (token == "=") {
-            if (operators.isEmpty()) nextAction = ParseAction::S2;
-            else nextAction = ParseAction::ERR;
-        }
-        // token is + or - operator
-        else if (token == "+" || token == "-") {
-            if (operators.isEmpty()) 
-                nextAction = ParseAction::ERR;
-            else if (operators.showTop() == "=" || operators.showTop() == "(") 
-                nextAction = ParseAction::S2;
-            else if (operators.showTop() == "+" || operators.showTop() == "-"
-                     || operators.showTop() == "*" || operators.showTop() == "/") {
-                // have to do another comparison
-                s1.push(operators.pop());
-                getAction(token);   // recursive call 
-            }
-        }
-        // token is * or / operator
-        else if (token == "*" || token == "/") {
-            if (operators.isEmpty()) 
-                nextAction = ParseAction::ERR;
-            else if (operators.showTop() == "=" || operators.showTop() == "+" 
-                     || operators.showTop() == "-" || operators.showTop() == "(") 
-                nextAction = ParseAction::S2;
-            else if (operators.showTop() == "*" || operators.showTop() == "/") {
-                // have to do another comparison
-                s1.push(operators.pop());
-                getAction(token);   // recursive call 
-            }
-        }
-        // token is ( operator
-        else if (token == "(") {
-            if (operators.isEmpty()) nextAction = ParseAction::ERR;
-            else nextAction = ParseAction::S2;
-        }
-        // token is ) operator
-        else if (token == ")") {
-            if (operators.isEmpty() || operators.showTop() == "=") 
-                nextAction = ParseAction::ERR;
-            else nextAction = ParseAction::UC;
-        }
-        // token is empty string or null char
-        else if (token == "\0" || token == "") {
-            nextAction = ParseAction::U2;
-        }
-
-        return nextAction;
+    // returns true if token is a numeric constant
+    bool Evaluator::isNum(string token) {
+        // check if number - also check negative
+        return isdigit(token[0]) || ( token[0] == '-' && isdigit(token[1]) ); 
     }
-
-    // Converts a string to lowercase char by char
-    string Evaluator::lowercase(std::string word) {
-        string lowercase = "";
-
-        for (size_t ch = 0; ch < word.length(); ch++) {
-            // check if char is uppercase, then convert by adding (ASCII code difference)
-            if (word[ch] >= 'A' && word[ch] <= 'Z')
-                lowercase += word[ch] + ('a' - 'A');
-            else   
-                lowercase += word[ch];
-        }
-
-        return lowercase;
-    }
-
+    
     // EVERTHING BELOW THIS WILL BE DELETED AFTER TESTING
     void Evaluator::showSymTable() {
         vars.GenStatReport();
+    }
+
+    // test something...
+    void Evaluator::test() {
+        
     }
 }
