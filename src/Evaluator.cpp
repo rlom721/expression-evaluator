@@ -39,7 +39,7 @@ namespace lomboy_a2 {
     Evaluator::Evaluator(const Evaluator& eval) {
         tknr = eval.tknr;
         hasFloat = eval.hasFloat;
-        operators = eval.operators;
+        // operators = eval.operators;
         vars.insertToHT("A", "5");
         vars.insertToHT("B", "10");
         vars.insertToHT("C", "-1");
@@ -55,6 +55,7 @@ namespace lomboy_a2 {
                resultKey;               // for variable assignment
         double op1 = 0.0, op2 = 0.0,    // operands for calculation
                result = 0.0;            // final result of expression
+        bool firstVarRead = false;      // has first variable been read?
         tknr.setStr(expression);        // to get tokens
 
         // loop while there are still tokens to get from string
@@ -68,14 +69,16 @@ namespace lomboy_a2 {
             }
             // token is a valid variable/identifier (starts with a letter) AND not unary op
             else if (isalpha(token[0]) && !isUnaryOp(token)) {
-                // if predefined variable, retrieve its value and push to nums
-                // else, define variable to assign result later
-                if (isVar(token))
-                    nums.push(stod(vars.getValue(token)));
-                else {
+                // save name of variable to assign result later
+                if (!firstVarRead) {
                     resultKey = token;
-                    // vars.insertToHT(resultKey, "EMPTY");
                 }
+                // if predefined variable is operand, push value to nums
+                else if (isVar(token)){
+                    nums.push(stod(vars.getValue(token)));
+                }
+
+                firstVarRead = true;
             }
             // if binary operator, perform calculation
             else if (token == "*" || token == "/" || token == "+" || token == "-") {
@@ -116,7 +119,7 @@ namespace lomboy_a2 {
             }
             // if assignment operator, then pop result from stack and assign to variable
             // used as resultKey (the first identifier encountered)
-            else if (token == "=") {
+            else if (token == "=" ) {
                 result = nums.pop();
                 vars.insertToHT(resultKey, to_string(result));
             }
@@ -128,70 +131,77 @@ namespace lomboy_a2 {
 
     // This method takes an expression in infix form and returns it as a postfix.
     string Evaluator::infixToPostfix(string expression) { 
-        string postfix;
-        Stack<string> tempStack;         // for popping to get postfix result
+        Stack<string> s1;    // holds operands, then postfix format in reverse
+        Stack<string> s2;    // used in getAction and postfix conversion
+        string postfix;             // final postfix format
+        Stack<string> tempStack;    // for popping to get postfix result
         string token;               // current token
         ParseAction action;         // enum code determines action for a token
         string temp;                // to throw away char "("
+        bool compareAgain = false;  // to be used with action U1, comparing same token
         tknr.setStr(expression);    // get tokens
 
         // loop while there are still tokens to read
         while (tknr.hasNext()) {
-            token = tknr.getNextToken();
-            action = getAction(token);
+            // move on to next token if previous action was NOT U1
+            if (!compareAgain) token = tknr.getNextToken();
+            action = getAction(token, s2.showTop(), s2.isEmpty());
+            compareAgain = false;
 
             // S1 code means stack input token to s1 stack
             if (action == ParseAction::S1) {
                 s1.push(token);
-                // postfix += " " + token;
             }
             // S2 code means stack input token to s2 stack
             else if (action == ParseAction::S2) {
-                operators.push(token);
+                s2.push(token);
             }
             // ERR code means error and invalid input
             else if (action == ParseAction::ERR) {
                 cout << "Error! Invalid expression.";
             }
-            // unstack operators to s1 until "(" is found then discard "("
+            // UC means unstack s2 to s1 until "(" is found then discard "("
             else if (action == ParseAction::UC) {
-                while (operators.showTop() != "(") 
-                    s1.push(operators.pop());
-                temp = operators.pop();
+                while (s2.showTop() != "(") 
+                    s1.push(s2.pop());
+                temp = s2.pop();
             }
-            // unstack operators to s1 until "(" is found
+            // U1 means unstack s2 to s1 then do another comparison
+            else if (action == ParseAction::U1) {
+                s1.push(s2.pop());
+                compareAgain = true;    // don't move to next token
+            }
+            // U2 means unstack s2 to s1 until "(" is found
             else if (action == ParseAction::U2) {
-                while (!operators.isEmpty())
-                    s1.push(operators.pop());
+                while (!s2.isEmpty())
+                    s1.push(s2.pop());
             }
         }
 
-        // unstack operators to s1 until operators is empty
-        while (!operators.isEmpty())
-            s1.push(operators.pop());
-            // postfix += " " + operators.pop();
+        // unstack s2 to s1 until s2 is empty
+        while (!s2.isEmpty())
+            s1.push(s2.pop());
 
-        // push contents of s1 to a temp stack, then pop to get postfix
+        // push contents of s1 to a temp stack
         while (!s1.isEmpty())
             tempStack.push(s1.pop());
 
+        // then pop contents to get postfix in correct order
         while (!tempStack.isEmpty())
             postfix += " " + tempStack.pop();
 
         return postfix;
     }
 
-    // ADD UNARY CHAR SUPPORT and... constant?
-    // This helper function returns a code corresponding to an action based on the current
-    // state of member Stack operators. (Implementation based on parse table.)
+    // This helper function (used in infix to postfix) returns a code corresponding to an 
+    // action based on the current state of s2 stack. (Implementation based on parse table.)
     // Argument passed is a token from evaluate().
-    // add case if token is unary??????
-    Evaluator::ParseAction Evaluator::getAction(string token) {
+    Evaluator::ParseAction Evaluator::getAction(string token, string stackTop, bool stackIsEmpty) {
         ParseAction nextAction;     // to return action code
 
         // input token is a unary operator
         if (isUnaryOp(token)) {
-            if (operators.isEmpty()) 
+            if (stackIsEmpty) 
                 nextAction = ParseAction::ERR;
             else 
                 nextAction = ParseAction::S2;
@@ -202,49 +212,47 @@ namespace lomboy_a2 {
         }
         // input token is = operator
         else if (token == "=") {
-            if (operators.isEmpty()) 
+            if (stackIsEmpty) 
                 nextAction = ParseAction::S2;
             else 
                 nextAction = ParseAction::ERR;
         }
         // input token is + or - operator
         else if (token == "+" || token == "-") {
-            if (operators.isEmpty()) 
+            if (stackIsEmpty) 
                 nextAction = ParseAction::ERR;
-            else if (operators.showTop() == "=" || operators.showTop() == "(") 
+            else if (stackTop == "=" || stackTop == "(") 
                 nextAction = ParseAction::S2;
-            else if (operators.showTop() == "+" || operators.showTop() == "-" 
-                     || operators.showTop() == "*" || operators.showTop() == "/" 
-                     || isUnaryOp(operators.showTop()) ) {
+            else if (stackTop == "+" || stackTop == "-" 
+                     || stackTop == "*" || stackTop == "/" 
+                     || isUnaryOp(stackTop) ) {
                 // have to do another comparison
-                s1.push(operators.pop());
-                nextAction = getAction(token);   // recursive call 
+                nextAction = ParseAction::U1;
             }
         }
         // input token is * or / operator
         else if (token == "*" || token == "/") {
-            if (operators.isEmpty()) 
+            if (stackIsEmpty) 
                 nextAction = ParseAction::ERR;
-            else if (operators.showTop() == "=" || operators.showTop() == "+" 
-                     || operators.showTop() == "-" || operators.showTop() == "(") 
+            else if (stackTop == "=" || stackTop == "+" 
+                     || stackTop == "-" || stackTop == "(") 
                 nextAction = ParseAction::S2;
-            else if (operators.showTop() == "*" || operators.showTop() == "/" 
-                     || isUnaryOp(operators.showTop()) ) {
+            else if (stackTop == "*" || stackTop == "/" 
+                     || isUnaryOp(stackTop) ) {
                 // have to do another comparison
-                s1.push(operators.pop());
-                nextAction = getAction(token);   // recursive call 
+                nextAction = ParseAction::U1;
             }
         }
         // input token is ( operator
         else if (token == "(") {
-            if (operators.isEmpty()) 
+            if (stackIsEmpty) 
                 nextAction = ParseAction::ERR;
             else 
                 nextAction = ParseAction::S2;
         }
         // input token is ) operator
         else if (token == ")") {
-            if (operators.isEmpty() || operators.showTop() == "=") 
+            if (stackIsEmpty || stackTop == "=") 
                 nextAction = ParseAction::ERR;
             else 
                 nextAction = ParseAction::UC;
@@ -280,7 +288,9 @@ namespace lomboy_a2 {
 
     // returns true if operator is sin, cos, sqrt or abs
     bool Evaluator::isUnaryOp(string tk) {
-        string lowerTk = lowercase(tk);
+        string lowerTk;
+        
+        if (isalpha(tk[0])) lowerTk = lowercase(tk);
         
         return lowerTk == "sin" || lowerTk == "cos" || lowerTk == "sqrt" 
                || lowerTk == "abs";

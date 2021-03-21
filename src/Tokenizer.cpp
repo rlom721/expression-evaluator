@@ -56,10 +56,10 @@ namespace lomboy_a2 {
         string token = "";                   // to return processed token
         bool endToken = false;             // flag
 
-        // if index already at end of str OR ignored char at end, reset
-        if (!hasNext() || ( (index == str.length() - 1) && isIgnored(str[index]) ) ) {
-            cout << "End of string reached. Call reset() to reset index.\n";
-        }
+        // // if index already at end of str OR ignored char at end
+        // if (!hasNext() || ( (index == str.length() - 1) && isIgnored(str[index]) ) ) {
+        //     cout << "End of string reached. Call reset() to reset index.\n";
+        // }
 
         // check that there are still tokens to read and delimiter not found
         while (hasNext() && !endToken) {

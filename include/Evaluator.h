@@ -34,16 +34,16 @@ namespace lomboy_a2 {
         void test();
     private:
         // enum - action codes for converting to postfix
-        enum class ParseAction { S1, S2, ERR, U2, UC };
+        enum class ParseAction { S1, S2, ERR, U1, U2, UC };
         // Helper functions
-        ParseAction getAction(std::string tk);
+        ParseAction getAction(std::string tk, std::string stackTop, bool stackIsEmpty);
         bool isVar(string tk);    // SymbolTable lookup
         bool isUnaryOp(string tk);      
         bool isNum(string tk);      
         // Member variables
         Tokenizer tknr;
-        Stack<string> s1;    // temp holds operands, then final postfix format
-        Stack<std::string> operators;   // used in getAction and postfix conversion
+        // Stack<string> s1;    // temp holds operands, then final postfix format
+        // Stack<std::string> operators;   // used in getAction and postfix conversion
         SymbolTable vars;    // stores variables and data
         bool hasFloat;          // flag to return int or double
     };

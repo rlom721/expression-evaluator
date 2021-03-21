@@ -4,6 +4,7 @@
 #include "List.h"        // header file for List class
 #include "Stack.h"       // header file for Stack class
 #include <iostream>
+#include <cassert>
 using namespace std;
 namespace lomboy_a2 {
 
@@ -74,10 +75,18 @@ namespace lomboy_a2 {
     // }
 
     // This method shows the top entry of the stack.
+    // Assumes stack is not empty.
     template <class DataType>
     typename Stack<DataType>::stackDataType Stack<DataType>::showTop() {
         typename List<DataType>::iterator topItem = this->start();       // assign iterator to top item
-        stackDataType topData = *topItem; // store data of item to return after deletion
+        stackDataType topData = stackDataType();    // return default value if stack is empty
+        // cout << (topData == "" ? "null string" : "all good") << endl;
+
+        // store data of item to return after deletion 
+        if (!isEmpty()) {
+            // assert(!isEmpty());
+            topData = *topItem; 
+        }
 
         return topData;
     }
