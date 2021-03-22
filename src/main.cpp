@@ -1,45 +1,57 @@
-// Program Name:    List, Stack and Queue Stub
+// Program Name:    Expression Evaluator
 // File Name:       main.cpp
 // Author:          Rafaela Lomboy
-// Date:            2021.03.05
-// Description:     This program demonstrates features of the List class, and its
-//                  derivatives Stack and Queue classes. It generates stub reports
-//                  showing various constructors and methods.
+// Date:            2021.03.26
+// Description:     This program...
 
 #include "Evaluator.h"
 // #include "Tokenizer.h"
-// #include "Hashtable.h"
 #include <iostream>
 #include <string>
+#include <limits>       // for cin.ignore()
 // #include <math.h>
 using namespace std;
 using namespace lomboy_a2;
 
+// ADD CHECK IF VAR IS NOT ON LHS
+// add check if NOT EXPRESSION!
 // remove annoying msg in tokenizer end of string reached
 
 int main () {
+    Evaluator eval;         // used to evaluate math expressions
+    string expression,      // user-inputted infix expression
+           postfix;         // converted to postfix format
+    bool done = false;      // program loop flag
+    char answer;            // user chooses to quit or continue
 
-    Evaluator eval;
+    cout << "Welcome to the Expression Evaluator!\n"
+         << "This program evaluates expressions written in infix format (ex. y = a + (b * c)).\n"
+         << "It supports addition, subtraction, divison, multiplication operators and\n"
+         << "the following unary operators: sin, cos, abs (absolute value) and sqrt (square \n"
+         << "root). It also supports user-defined variables.\n"
+         << "The following variables have been predefined: \n"
+         << "A = 10, B = 5, C = -1, D = 2\n\n";
 
-    cout << eval.infixToPostfix("y = 7 + 8") << endl;
-    cout << eval.infixToPostfix("y = a + b / c * d") << endl;
-    cout << eval.infixToPostfix("y = a + 5.0 / 1 * d") << endl;
-    cout << eval.infixToPostfix("y = sin( a - b ) / cos (c + d)") << endl;
-    cout << "\n y -7 = " << eval.evaluate(" y -7 = ")
-         << "\n y 8 y + =" << eval.evaluate(" y 8 y + =")
-         << "\n x 9 sqrt =" << eval.evaluate(" x 9 sqrt =");
-    // eval.testGetAction();
-    // string expression = "x 5 4 * 3 2 * + 1 - =";
-    // cout << expression << " >> " << eval.evaluate(expression) << endl;
-    // cout << "y A B 1.5 * + C D / - =" << " >> " 
-        // << eval.evaluate("y A B 1.5 * + C D / - =") << endl;
-    // cout << "w x sqrt =" << " >> " << eval.evaluate("w x sqrt =") << endl;
-    // cout << "z x sin =" << " >> " << eval.evaluate("z x sin =") << endl;
-    // cout << "v -8.7 =" << " >> " << eval.evaluate("v -8.7 =") << endl;
-    // cout << "v -8.7 aBs =" << " >> " << eval.evaluate("v -8.7 aBs =") << endl;
-    // cout << "1 A + 5 *" << " >> " << eval.evaluate("1 A + 5 *") << endl;
+    while (!done) {
+        cout << "Enter an expression: ";
+        getline(cin, expression);
 
-     // eval.showSymTable();
+        cout << "You entered: " << expression << endl;
+        postfix = eval.infixToPostfix(expression);
+        cout << eval.evaluate(postfix) << endl;
+        // cout << eval.evaluate(eval.infixToPostfix("y = 7 + 8")) << endl;
+        // cout << eval.infixToPostfix("y = a + b / c * d") << endl;
+        // cout << eval.infixToPostfix("y = a + 5.0 / 1 * d") << endl;
+        // cout << eval.infixToPostfix("y = sin( a - b ) / cos (c + d)") << endl;
+        cout << "Would you like to enter another expression?\nEnter q to quit or any key to continue: ";
+        cin.get(answer);
+        cin.clear();
+        cin.ignore( numeric_limits <streamsize>::max(), '\n' );
+
+        if (answer == 'q' || answer == 'Q') done = true;
+    }
+
+    cout << "Ending Expression Evaluator program... Goodbye!\n";
 
     return 0;
 }
