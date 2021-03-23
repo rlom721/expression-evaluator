@@ -160,11 +160,10 @@ void Hashtable::insertToHT(string entryKey, string entryData, int index) {
 // Hash function takes ordinal value of 2nd, 4th and 6th chars of a key
 // then modulo by the number of primary buckets (20) to obtain index of table
 int Hashtable::hashFunc(string key) const {
-  int sum;
+  int sum = 0;
   
-  for (size_t i = 0; i < key.length(); i++)
-    sum += key[0];
-  //  int sum = key[2] + key[4] + key[6];
+  for (int i = 0; i < int(key.length()); i++)
+    sum += key[i];
 
   return (sum % CAP);
 }

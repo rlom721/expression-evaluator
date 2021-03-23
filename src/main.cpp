@@ -16,11 +16,13 @@ using namespace lomboy_a2;
 // ADD CHECK IF VAR IS NOT ON LHS
 // add check if NOT EXPRESSION!
 // remove annoying msg in tokenizer end of string reached
+// fix copy - hashtable contents
 
 int main () {
     Evaluator eval;         // used to evaluate math expressions
     string expression,      // user-inputted infix expression
-           postfix;         // converted to postfix format
+           postfix,         // converted to postfix format
+           lhsVar;          // left-hand side variable
     bool done = false;      // program loop flag
     char answer;            // user chooses to quit or continue
 
@@ -37,19 +39,27 @@ int main () {
         getline(cin, expression);
 
         cout << "You entered: " << expression << endl;
+
+        // convert expression to postfix, then evaluate and display result
         postfix = eval.infixToPostfix(expression);
-        cout << eval.evaluate(postfix) << endl;
+        lhsVar = expression.substr(0, expression.find('='));
+        cout << lhsVar << "= " << eval.evaluate(postfix) << endl;
         // cout << eval.evaluate(eval.infixToPostfix("y = 7 + 8")) << endl;
         // cout << eval.infixToPostfix("y = a + b / c * d") << endl;
         // cout << eval.infixToPostfix("y = a + 5.0 / 1 * d") << endl;
         // cout << eval.infixToPostfix("y = sin( a - b ) / cos (c + d)") << endl;
+
         cout << "Would you like to enter another expression?\nEnter q to quit or any key to continue: ";
         cin.get(answer);
-        cin.clear();
-        cin.ignore( numeric_limits <streamsize>::max(), '\n' );
 
+        // clear buffer
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        // loop control
         if (answer == 'q' || answer == 'Q') done = true;
     }
+    // eval.showSymTable();
 
     cout << "Ending Expression Evaluator program... Goodbye!\n";
 

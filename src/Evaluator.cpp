@@ -19,7 +19,7 @@ namespace lomboy_a2 {
 
     // Default constructor sets values to defaults (such as delimiters for tokenizer)
     // and inserts predefined variable values into symbol table
-    Evaluator::Evaluator() : tknr("", " ()-+/*="), hasFloat(true) { 
+    Evaluator::Evaluator() : tknr("", " ()-+/*=") { 
         vars.insertToHT("A", "10");
         vars.insertToHT("B", "5");
         vars.insertToHT("C", "-1");
@@ -28,7 +28,7 @@ namespace lomboy_a2 {
 
     // Parametrized constructor sets member variables to arguments 
     Evaluator::Evaluator(string str, string delims) 
-        : tknr("", " ()-+/*="), hasFloat(true)  { 
+        : tknr("", " ()-+/*=") { 
         vars.insertToHT("A", "10");
         vars.insertToHT("B", "5");
         vars.insertToHT("C", "-1");
@@ -38,7 +38,6 @@ namespace lomboy_a2 {
     // Copy constructor copies member variables
     Evaluator::Evaluator(const Evaluator& eval) {
         tknr = eval.tknr;
-        hasFloat = eval.hasFloat;
         // operators = eval.operators;
         vars.insertToHT("A", "5");
         vars.insertToHT("B", "10");
@@ -56,74 +55,80 @@ namespace lomboy_a2 {
         double op1 = 0.0, op2 = 0.0,    // operands for calculation
                result = 0.0;            // final result of expression
         bool firstVarRead = false;      // has first variable been read?
-        tknr.setStr(expression);        // to get tokens
 
-        // loop while there are still tokens to get from string
-        while (tknr.hasNext()) {
-            // nums.showStack();            // FOR DEGUGGING
-            token = tknr.getNextToken();
+        // // check if expression is valid first
+        // if (!isValidExp(expression))
+        //     cout << "Please enter a valid expression.\n";
+        // else {
+            tknr.setStr(expression);        // to get tokens
 
-            // token is a constant number (check for negative number too)
-            if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
-                nums.push(stod(token));
-            }
-            // token is a valid variable/identifier (starts with a letter) AND not unary op
-            else if (isalpha(token[0]) && !isUnaryOp(token)) {
-                // save name of variable to assign result later
-                if (!firstVarRead) {
-                    resultKey = token;
-                }
-                // if predefined variable is operand, push value to nums
-                else if (isVar(token)){
-                    nums.push(stod(vars.getValue(token)));
-                }
+            // loop while there are still tokens to get from string
+            while (tknr.hasNext()) {
+                // nums.showStack();            // FOR DEGUGGING
+                token = tknr.getNextToken();
 
-                firstVarRead = true;
-            }
-            // if binary operator, perform calculation
-            else if (token == "*" || token == "/" || token == "+" || token == "-") {
-                op2 = nums.pop();   // get operands
-                op1 = nums.pop();
+                // token is a constant number (check for negative number too)
+                if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
+                    nums.push(stod(token));
+                }
+                // token is a valid variable/identifier (starts with a letter) AND not unary op
+                else if (isalpha(token[0]) && !isUnaryOp(token)) {
+                    // save name of variable to assign result later
+                    if (!firstVarRead) {
+                        resultKey = token;
+                    }
+                    // if predefined variable is operand, push value to nums
+                    else if (isVar(token)){
+                        nums.push(stod(vars.getValue(token)));
+                    }
 
-                // perform calculation based on operator, push result back to stack
-                if (token == "*") {
-                    nums.push(op1 * op2);
+                    firstVarRead = true;
                 }
-                else if (token == "/") {
-                    nums.push(op1 / op2);
-                }
-                else if (token == "+") {
-                    nums.push(op1 + op2);
-                }
-                else if (token == "-") {
-                    nums.push(op1 - op2);
-                }
-            }
-            // if unary op, perform calculation (also check its not empty or string with null)
-            else if (isUnaryOp(token)) {
-                op1 = nums.pop();   // get operand
+                // if binary operator, perform calculation
+                else if (token == "*" || token == "/" || token == "+" || token == "-") {
+                    op2 = nums.pop();   // get operands
+                    op1 = nums.pop();
 
-                // perform calculation based on operator, push result back to stack
-                if (lowercase(token) == "sin") {
-                    nums.push(sin(op1));
+                    // perform calculation based on operator, push result back to stack
+                    if (token == "*") {
+                        nums.push(op1 * op2);
+                    }
+                    else if (token == "/") {
+                        nums.push(op1 / op2);
+                    }
+                    else if (token == "+") {
+                        nums.push(op1 + op2);
+                    }
+                    else if (token == "-") {
+                        nums.push(op1 - op2);
+                    }
                 }
-                else if (lowercase(token) == "cos") {
-                    nums.push(cos(op1));
+                // if unary op, perform calculation (also check its not empty or string with null)
+                else if (isUnaryOp(token)) {
+                    op1 = nums.pop();   // get operand
+
+                    // perform calculation based on operator, push result back to stack
+                    if (lowercase(token) == "sin") {
+                        nums.push(sin(op1));
+                    }
+                    else if (lowercase(token) == "cos") {
+                        nums.push(cos(op1));
+                    }
+                    else if (lowercase(token) == "sqrt") {
+                        nums.push(sqrt(op1));
+                    }
+                    else if (lowercase(token) == "abs") {
+                        nums.push(abs(op1));
+                    }
                 }
-                else if (lowercase(token) == "sqrt") {
-                    nums.push(sqrt(op1));
-                }
-                else if (lowercase(token) == "abs") {
-                    nums.push(abs(op1));
+                // if assignment operator, then pop result from stack and assign to variable
+                // used as resultKey (the first identifier encountered)
+                else if (token == "=" ) {
+                    result = nums.pop();
+                    vars.insertToHT(resultKey, to_string(result));
                 }
             }
-            // if assignment operator, then pop result from stack and assign to variable
-            // used as resultKey (the first identifier encountered)
-            else if (token == "=" ) {
-                result = nums.pop();
-                vars.insertToHT(resultKey, to_string(result));
-            }
-        }
+        // }
 
         // final and only item in stack is result
         return result;
@@ -302,13 +307,17 @@ namespace lomboy_a2 {
         return isdigit(token[0]) || ( token[0] == '-' && isdigit(token[1]) ); 
     }
     
+    // returns true if infix expression is valid
+    bool isValidExp(std::string expression) {
+        bool isValid = false;
+
+        
+
+        return isValid;
+    }
+
     // EVERTHING BELOW THIS WILL BE DELETED AFTER TESTING
     void Evaluator::showSymTable() {
         vars.GenStatReport();
-    }
-
-    // test something...
-    void Evaluator::test() {
-        
     }
 }
