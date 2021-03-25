@@ -18,17 +18,25 @@ Hashtable::Hashtable() {
   nextOFBucket = CAP;         // index of next overflow bucket is after primary
 }
 
+// FIX! add check to overwrite data
 // This method takes a key and data pair, hashes the key to an index, then
 // inserts pair into hashtable.
 void Hashtable::insertToHT(string entryKey, string entryData) {
   int slot = 0;     // slot index in bucket
   int index = -1;   // bucket index
+  bool alreadyPres = false;    // to see if already an entry
 
   // determine index in table by hashing the key, if NOT searching OF bucket
   index = hashFunc(entryKey);
 
+  // find exact match using key, then overwrite the data
+  findRecord(entryKey, alreadyPres, slot, index);
+
+  if (alreadyPres) {
+    buckets[index].set(entryKey, entryData, slot);
+  }
   // insert key and data in next open slot in bucket
-  if (buckets[index].hasFreeSlot()) {
+  else if (buckets[index].hasFreeSlot()) {
     slot = buckets[index].getNextOpenSlot();
     buckets[index].set(entryKey, entryData, slot);
 

@@ -5,7 +5,7 @@
 // Description:     This program...
 
 #include "Evaluator.h"
-// #include "Tokenizer.h"
+#include "Parser.h"
 #include <iostream>
 #include <string>
 #include <limits>       // for cin.ignore()
@@ -20,6 +20,7 @@ using namespace lomboy_a2;
 
 int main () {
     Evaluator eval;         // used to evaluate math expressions
+    Parser prsr;            // used to convert to postfix
     string expression,      // user-inputted infix expression
            postfix,         // converted to postfix format
            lhsVar;          // left-hand side variable
@@ -41,7 +42,7 @@ int main () {
         cout << "You entered: " << expression << endl;
 
         // convert expression to postfix, then evaluate and display result
-        postfix = eval.infixToPostfix(expression);
+        postfix = prsr.infixToPostfix(expression);
         lhsVar = expression.substr(0, expression.find('='));
         cout << lhsVar << "= " << eval.evaluate(postfix) << endl;
         // cout << eval.evaluate(eval.infixToPostfix("y = 7 + 8")) << endl;
@@ -59,7 +60,8 @@ int main () {
         // loop control
         if (answer == 'q' || answer == 'Q') done = true;
     }
-    // eval.showSymTable();
+    
+    eval.showSymTable();
 
     cout << "Ending Expression Evaluator program... Goodbye!\n";
 

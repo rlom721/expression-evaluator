@@ -7,12 +7,10 @@
 #define EVALUATOR_H
 
 #include "Hashtable.h"
-#include "Tokenizer.h"
-#include "Stack.h"          // for evaluating postfix expression
+#include "Parser.h"
+// #include "Stack.h"          // for evaluating postfix expression
 #include <string>
 namespace lomboy_a2 {
-
-    // return MOST PRECISE... so int or float? how tho...
 
     class Evaluator {
         // typedef
@@ -26,21 +24,18 @@ namespace lomboy_a2 {
         double evaluate(std::string expression);  // hmm can be int tho...
         // void reset();
         // Constant methods
-        std::string infixToPostfix(std::string expression);
+        // std::string infixToPostfix(std::string expression);
         void showSymTable();
         // bool isOperand(string tk);
     private:
         // enum - action codes for converting to postfix
-        enum class ParseAction { S1, S2, ERR, U1, U2, UC };
+        // enum class ParseAction { S1, S2, ERR, U1, U2, UC };
         // Helper functions
-        ParseAction getAction(std::string tk, std::string stackTop, bool stackIsEmpty);
+        // ParseAction getAction(std::string tk, std::string stackTop, bool stackIsEmpty);
         bool isVar(string tk);    // SymbolTable lookup
-        bool isUnaryOp(string tk);      
-        bool isNum(string tk);      
         bool isValidExp(std::string expression);
-        std::string lowercase(std::string word);
         // Member variables
-        Tokenizer tknr;
+        Parser tknr;         // used to parse out tokens
         SymbolTable vars;    // stores variables and data
     };
 
