@@ -1,6 +1,7 @@
 // Specification file for Parser class
 //
 // This class takes a string and provides methods for tokenizing it.
+// It also provides a method for converting from infix to postfix.
 
 #ifndef PARSER_H
 #define PARSER_H

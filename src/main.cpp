@@ -20,7 +20,7 @@ using namespace lomboy_a2;
 
 int main () {
     Evaluator eval;         // used to evaluate math expressions
-    Parser prsr;            // used to convert to postfix
+    Parser prsr("", " ()-+/*=");  // used to convert to postfix (arguments: expression, delimiters)
     string expression,      // user-inputted infix expression
            postfix,         // converted to postfix format
            lhsVar;          // left-hand side variable
@@ -28,10 +28,12 @@ int main () {
     char answer;            // user chooses to quit or continue
 
     cout << "Welcome to the Expression Evaluator!\n"
-         << "This program evaluates expressions written in infix format (ex. y = a + (b * c)).\n"
-         << "It supports addition, subtraction, divison, multiplication operators and\n"
-         << "the following unary operators: sin, cos, abs (absolute value) and sqrt (square \n"
-         << "root). It also supports user-defined variables.\n"
+         << " This program evaluates expressions written in infix format.\n"
+         << " It supports addition, subtraction, divison, multiplication operators and\n"
+         << " the following unary operators: sin, cos, abs (absolute value) and sqrt (square \n"
+         << " root). It also supports user-defined variables.\n"
+         << "IMPORTANT:\n -use of unary operators require parentheses (ex. sin(x)).\n"
+         << " -user-defined variables are case-sensitive (e.g. lambda is NOT equal to LAMBDA)\n\n"
          << "The following variables have been predefined: \n"
          << "A = 10, B = 5, C = -1, D = 2\n\n";
 
@@ -39,10 +41,10 @@ int main () {
         cout << "Enter an expression: ";
         getline(cin, expression);
 
-        cout << "You entered: " << expression << endl;
-
         // convert expression to postfix, then evaluate and display result
         postfix = prsr.infixToPostfix(expression);
+        cout << "Postfix: " << postfix << endl;
+
         lhsVar = expression.substr(0, expression.find('='));
         cout << lhsVar << "= " << eval.evaluate(postfix) << endl;
         // cout << eval.evaluate(eval.infixToPostfix("y = 7 + 8")) << endl;
@@ -61,7 +63,7 @@ int main () {
         if (answer == 'q' || answer == 'Q') done = true;
     }
     
-    eval.showSymTable();
+    // eval.showSymTable();
 
     cout << "Ending Expression Evaluator program... Goodbye!\n";
 

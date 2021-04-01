@@ -24,18 +24,12 @@ namespace lomboy_a2 {
         double evaluate(std::string expression);  // hmm can be int tho...
         // void reset();
         // Constant methods
-        // std::string infixToPostfix(std::string expression);
         void showSymTable();
-        // bool isOperand(string tk);
     private:
-        // enum - action codes for converting to postfix
-        // enum class ParseAction { S1, S2, ERR, U1, U2, UC };
         // Helper functions
-        // ParseAction getAction(std::string tk, std::string stackTop, bool stackIsEmpty);
         bool isVar(string tk);    // SymbolTable lookup
-        bool isValidExp(std::string expression);
         // Member variables
-        Parser tknr;         // used to parse out tokens
+        Parser tknr;         // used to parse out tokens in evaluate
         SymbolTable vars;    // stores variables and data
     };
 
