@@ -5,15 +5,13 @@
 #include "Parser.h"
 #include "Stack.h"          // for evaluating postfix expression
 #include "Stack.cpp"
-#include "List.h"          // for evaluating postfix expression
+#include "List.h"           
 #include "List.cpp"
-#include "ListItem.h"          // for evaluating postfix expression
+#include "ListItem.h"       
 #include "ListItem.cpp"
 #include <string>
-#include <iostream>     // for cout
-#include <math.h>     // for sin, cos, sqrt, abs functions
-// #include <exception>     // for throwing exceptions
-// #include <cassert>
+#include <iostream>     
+#include <math.h>           // for sin, cos, sqrt, abs functions
 using namespace std;
 namespace lomboy_a2 {
 
