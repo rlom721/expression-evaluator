@@ -45,9 +45,7 @@ namespace lomboy_a2 {
         std::string str;
         std::string delimiters;
         std::string ignores;
-        // std::vector<std::string> tokens;
-        // vector<std::string> keyWords; // parse key words...
-        size_t index;         // keeps track of current string position
+        size_t index;          // keeps track of current string position
         bool retDelims;        // getNextToken will return delimiters
     };
 

@@ -2,6 +2,7 @@
 // File name: Parser.cpp
 
 #include "Parser.h"
+#include "ParseErr.h"
 #include "Stack.h"          // for evaluating postfix expression
 #include "Stack.cpp"
 #include "List.h"          // for evaluating postfix expression
@@ -29,7 +30,6 @@ namespace lomboy_a2 {
         ignores = tkn.ignores;
         index = tkn.index;
         retDelims = tkn.retDelims;
-        // tokens = tkn.tokens;
     }
 
     // Sets str member to be tokenized and reset index
@@ -83,13 +83,21 @@ namespace lomboy_a2 {
             }
             // ERR code means error and invalid input
             else if (action == ParseAction::ERR) {
-                cout << "Error! Invalid expression.";
+                postfix = "ERR";
+                throw ParseErr();
             }
             // UC means unstack s2 to s1 until "(" is found then discard "("
+            // otherwise, stop if not found and show error
             else if (action == ParseAction::UC) {
-                while (s2.showTop() != "(") 
+                while (s2.showTop() != "(" && !s2.isEmpty()) 
                     s1.push(s2.pop());
-                temp = s2.pop();
+
+                if (s2.showTop() == "(") 
+                    temp = s2.pop();
+                else {
+                    postfix = "ERR";
+                    throw ParseErr("unmatched parentheses");
+                }
             }
             // U1 means unstack s2 to s1 then do another comparison
             else if (action == ParseAction::U1) {
@@ -103,17 +111,19 @@ namespace lomboy_a2 {
             }
         }
 
-        // unstack s2 to s1 until s2 is empty
-        while (!s2.isEmpty())
-            s1.push(s2.pop());
+        if (postfix != "ERR") {
+            // unstack s2 to s1 until s2 is empty
+            while (!s2.isEmpty())
+                s1.push(s2.pop());
 
-        // push contents of s1 to a temp stack
-        while (!s1.isEmpty())
-            tempStack.push(s1.pop());
+            // push contents of s1 to a temp stack
+            while (!s1.isEmpty())
+                tempStack.push(s1.pop());
 
-        // then pop contents to get postfix in correct order
-        while (!tempStack.isEmpty())
-            postfix += " " + tempStack.pop();
+            // then pop contents to get postfix in correct order
+            while (!tempStack.isEmpty())
+                postfix += " " + tempStack.pop();
+        }
 
         return postfix;
     }
