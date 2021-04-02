@@ -37,7 +37,7 @@ namespace lomboy_a2 {
     // Sets str member to be tokenized and reset index
     void Parser::setStr(string str) {
         this->str = str;
-        reset();
+        index = 0;
     }
 
     // Sets delimiters for parsing
@@ -58,13 +58,12 @@ namespace lomboy_a2 {
 
     // This method takes an expression in infix form and returns it as a postfix.
     string Parser::infixToPostfix(string expression) { 
-        Queue<string> s1;    // holds operands, then postfix format in reverse
-        Stack<string> s2;    // used in getAction and postfix conversion
+        // Queue<string> s1;    // holds operands, then postfix format in reverse
+        // Stack<string> s2;    // used in getAction and postfix conversion
         string postfix;             // final postfix format
         Stack<string> tempStack;    // for popping to get postfix result
         string token;               // current token
         ParseAction action;         // enum code determines action for a token
-        string temp;                // to throw away char "("
         bool compareAgain = false;  // to be used with action U1, comparing same token
         setStr(expression);         // get tokens
 
@@ -75,13 +74,13 @@ namespace lomboy_a2 {
             action = getAction(token, s2.showTop(), s2.isEmpty());
             compareAgain = false;
 
-            // S1 code means stack input token to s1 stack
+            // S1 code means stack input token to s1 queue
             if (action == ParseAction::S1) {
-                s1.enqueue(token);
+                DoS1(token);
             }
             // S2 code means stack input token to s2 stack
             else if (action == ParseAction::S2) {
-                s2.push(token);
+                DoS2(token);
             }
             // ERR code means error and invalid input
             else if (action == ParseAction::ERR) {
@@ -91,25 +90,16 @@ namespace lomboy_a2 {
             // UC means unstack s2 to s1 until "(" is found then discard "("
             // otherwise, stop if not found and show error
             else if (action == ParseAction::UC) {
-                while (s2.showTop() != "(" && !s2.isEmpty()) 
-                    s1.enqueue(s2.pop());
-
-                if (s2.showTop() == "(") 
-                    temp = s2.pop();
-                else {
-                    postfix = "ERR";
-                    throw ParseErr("unmatched parentheses");
-                }
+                DoUC();
             }
             // U1 means unstack s2 to s1 then do another comparison
             else if (action == ParseAction::U1) {
-                s1.enqueue(s2.pop());
+                DoU1();
                 compareAgain = true;    // don't move to next token
             }
             // U2 means unstack s2 to s1 until "(" is found
             else if (action == ParseAction::U2) {
-                while (!s2.isEmpty())
-                    s1.enqueue(s2.pop());
+                DoU2();
             }
         }
 
@@ -122,6 +112,42 @@ namespace lomboy_a2 {
             postfix += " " + s1.dequeue();
 
         return postfix;
+    }
+
+    // Execute U1 by unstacking s2 to s1 then doing another comparison
+    void Parser::DoU1() {
+        s1.enqueue(s2.pop());
+    }
+
+    // Execute U2 by unstacking s2 to s1 until "(" is found
+    void Parser::DoU2() {
+        while (!s2.isEmpty())
+            s1.enqueue(s2.pop());
+    }
+
+    // Execute UC by unstacking s2 to s1 until "(" is found then discard "("
+    // If error, stop if not found and show error
+    void Parser::DoUC() {
+        string temp;                // to throw away char "("
+
+        while (s2.showTop() != "(" && !s2.isEmpty()) 
+            s1.enqueue(s2.pop());
+
+        if (s2.showTop() == "(") 
+            temp = s2.pop();
+        else {
+            throw ParseErr("unmatched parentheses");
+        }
+    }
+
+    // Execute S1 code by stacking input token to s1 queue
+    void Parser::DoS1(string tk) {
+        s1.enqueue(tk);
+    }
+
+    // Execute S2 code by stacking input token to s2 stack
+    void Parser::DoS2(string tk) {
+        s2.push(tk);
     }
 
     // This helper function (used in infix to postfix) returns a code corresponding to an 
@@ -250,12 +276,6 @@ namespace lomboy_a2 {
 
         return token;
     }
-
-    // Resets index to start. To be used if user wants to retiterate through tokens in str.
-    void Parser::reset() {
-        index = 0;
-    }
-
 
     // Returns true if there are more characters in string from index position
     bool Parser::hasNext() {

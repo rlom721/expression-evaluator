@@ -6,8 +6,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include "Stack.h"          // for evaluating postfix expression
+#include "Queue.h"          // for evaluating postfix expression
 #include <string>
-// #include <vector>
 namespace lomboy_a2 {
 
     class Parser {
@@ -23,7 +24,11 @@ namespace lomboy_a2 {
         void setIgnores(std::string ignores);
         void returnDelims(bool tf);             // sets retDelim
         std::string getNextToken();
-        void reset();
+        void DoU1();
+        void DoU2();
+        void DoUC();
+        void DoS1(std::string tk);
+        void DoS2(std::string tk);
         // Constant methods
         bool hasNext();
         std::string getStr() { return str; }
@@ -33,7 +38,6 @@ namespace lomboy_a2 {
         bool isNum(std::string tk);      
         bool isFound(char c, std::string chars); 
         std::string lowercase(std::string word);
-        // size_t getIndex() { return index; }
     private:
         // enum - action codes for converting to postfix
         enum class ParseAction { S1, S2, ERR, U1, U2, UC };
@@ -42,6 +46,8 @@ namespace lomboy_a2 {
         bool isDelim(char c); 
         bool isIgnored(char c); 
         // Member variables
+        Queue<std::string> s1;    // holds operands, then postfix format in reverse
+        Stack<std::string> s2;    // used in getAction and postfix conversion
         std::string str;
         std::string delimiters;
         std::string ignores;
