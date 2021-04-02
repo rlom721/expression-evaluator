@@ -8,9 +8,12 @@ This calculator is implemented with a stack and queue, hashtable, postfix notati
 
 > Note: Stack, Queue, List, Hashtable and all other classes are custom-made classes by the author. By no means are they more efficient than pre-existing C++ modules, but they served as a learning tool for understand how these data structures work.
 
+
 ![](ex1.png)
 
 For more information on the implementation and goals of this project please navigate to `/docs` to view documentation files.
+
+Fun fact: this program was written over the course of a college semester (about four months excluding syllabus and finals week) and resulted in **20 source code files** **almost 1500 lines of code**.
 
 ## Getting Started
 
@@ -35,6 +38,7 @@ make run
 
 ## Usage
 After running `make run`, you should see the following in your terminal:
+
 ![](ex1.png)
 
 Take note of the instructions:
@@ -44,6 +48,7 @@ Take note of the instructions:
 > The following variables have been predefined: A = 10, B = 5, C = -1, D = 2  
 
 Another example of valid use:
+
 ![](ex2.png)
 
 This program allows the user to redefine pre-existing variables. In fact, the only valid expressions assign a variable A, B, C or D to an expression in *infix* format with valid functions. (See message in output.) For example: `D = D*C - A/B` is a valid expression but `SIN(D)` is not.
