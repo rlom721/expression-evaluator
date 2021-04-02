@@ -5,6 +5,8 @@
 #include "ParseErr.h"
 #include "Stack.h"          // for evaluating postfix expression
 #include "Stack.cpp"
+#include "Queue.h"          // for evaluating postfix expression
+#include "Queue.cpp"
 #include "List.h"          // for evaluating postfix expression
 #include "List.cpp"
 #include "ListItem.h"          // for evaluating postfix expression
@@ -56,7 +58,7 @@ namespace lomboy_a2 {
 
     // This method takes an expression in infix form and returns it as a postfix.
     string Parser::infixToPostfix(string expression) { 
-        Stack<string> s1;    // holds operands, then postfix format in reverse
+        Queue<string> s1;    // holds operands, then postfix format in reverse
         Stack<string> s2;    // used in getAction and postfix conversion
         string postfix;             // final postfix format
         Stack<string> tempStack;    // for popping to get postfix result
@@ -75,7 +77,7 @@ namespace lomboy_a2 {
 
             // S1 code means stack input token to s1 stack
             if (action == ParseAction::S1) {
-                s1.push(token);
+                s1.enqueue(token);
             }
             // S2 code means stack input token to s2 stack
             else if (action == ParseAction::S2) {
@@ -90,7 +92,7 @@ namespace lomboy_a2 {
             // otherwise, stop if not found and show error
             else if (action == ParseAction::UC) {
                 while (s2.showTop() != "(" && !s2.isEmpty()) 
-                    s1.push(s2.pop());
+                    s1.enqueue(s2.pop());
 
                 if (s2.showTop() == "(") 
                     temp = s2.pop();
@@ -101,29 +103,23 @@ namespace lomboy_a2 {
             }
             // U1 means unstack s2 to s1 then do another comparison
             else if (action == ParseAction::U1) {
-                s1.push(s2.pop());
+                s1.enqueue(s2.pop());
                 compareAgain = true;    // don't move to next token
             }
             // U2 means unstack s2 to s1 until "(" is found
             else if (action == ParseAction::U2) {
                 while (!s2.isEmpty())
-                    s1.push(s2.pop());
+                    s1.enqueue(s2.pop());
             }
         }
 
-        if (postfix != "ERR") {
-            // unstack s2 to s1 until s2 is empty
-            while (!s2.isEmpty())
-                s1.push(s2.pop());
+        // unstack s2 to s1 until s2 is empty
+        while (!s2.isEmpty())
+            s1.enqueue(s2.pop());
 
-            // push contents of s1 to a temp stack
-            while (!s1.isEmpty())
-                tempStack.push(s1.pop());
-
-            // then pop contents to get postfix in correct order
-            while (!tempStack.isEmpty())
-                postfix += " " + tempStack.pop();
-        }
+        // then pop contents to get postfix in correct order
+        while (!s1.isEmpty())
+            postfix += " " + s1.dequeue();
 
         return postfix;
     }
