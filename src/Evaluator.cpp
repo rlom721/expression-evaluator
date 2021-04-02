@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>     // for cout
 #include <math.h>     // for sin, cos, sqrt, abs functions
+// #include <exception>     // for throwing exceptions
 // #include <cassert>
 using namespace std;
 namespace lomboy_a2 {
@@ -62,8 +63,12 @@ namespace lomboy_a2 {
             // nums.showStack();            // FOR DEGUGGING
             token = tknr.getNextToken();
 
+            // check for valid identifier name on left-hand side
+            if (!firstVarRead && !isalpha(token[0])) {
+                throw runtime_error("invalid identifier on left-hand side");
+            }
             // token is a constant number (check for negative number too)
-            if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
+            else if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
                 nums.push(stod(token));
             }
             // token is a valid variable/identifier (starts with a letter) AND not unary op
@@ -75,6 +80,10 @@ namespace lomboy_a2 {
                 // if predefined variable is operand, push value to nums
                 else if (isVar(token)){
                     nums.push(stod(vars.getValue(token)));
+                }
+                // invalid variable provided (not predefined and on right-hand side)
+                else {
+                    throw runtime_error("undefined identifier(s) on right-hand side");
                 }
 
                 firstVarRead = true;
@@ -89,7 +98,10 @@ namespace lomboy_a2 {
                     nums.push(op1 * op2);
                 }
                 else if (token == "/") {
-                    nums.push(op1 / op2);
+                    if (op2 == 0)
+                        throw runtime_error("division by zero");
+                    else
+                        nums.push(op1 / op2);
                 }
                 else if (token == "+") {
                     nums.push(op1 + op2);

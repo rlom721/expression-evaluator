@@ -6,17 +6,12 @@
 
 #include "Evaluator.h"
 #include "Parser.h"
+#include "ParseErr.h"
 #include <iostream>
 #include <string>
 #include <limits>       // for cin.ignore()
-// #include <math.h>
 using namespace std;
 using namespace lomboy_a2;
-
-// ADD CHECK IF VAR IS NOT ON LHS
-// add check if NOT EXPRESSION!
-// remove annoying msg in tokenizer end of string reached
-// fix copy - hashtable contents
 
 int main () {
     Evaluator eval;         // used to evaluate math expressions
@@ -24,6 +19,7 @@ int main () {
     string expression,      // user-inputted infix expression
            postfix,         // converted to postfix format
            lhsVar;          // left-hand side variable
+    double result = 0.0;    // result of entered expression
     bool done = false;      // program loop flag
     char answer;            // user chooses to quit or continue
 
@@ -42,17 +38,31 @@ int main () {
         getline(cin, expression);
 
         // convert expression to postfix, then evaluate and display result
-        postfix = prsr.infixToPostfix(expression);
-        cout << "Postfix: " << postfix << endl;
+        try {
+            // convert from infix to postfix then display
+            postfix = prsr.infixToPostfix(expression);
+            cout << "Postfix: " << postfix << endl;
 
-        lhsVar = expression.substr(0, expression.find('='));
-        cout << lhsVar << "= " << eval.evaluate(postfix) << endl;
+            // evaluate result then display left-hand variable equal to result
+            result = eval.evaluate(postfix);
+            lhsVar = expression.substr(0, expression.find('='));
+            cout << lhsVar << "= " << result << endl;
+        }
+        // check for evaluation error
+        catch (runtime_error& re) {
+            cerr << "Evaluator Error - " << re.what() << "." << endl;
+        }
+        // check for parse error thrown
+        catch (ParseErr& pe) {
+            cerr << "Parse Error - " << pe.what() << endl;
+        }
+
         // cout << eval.evaluate(eval.infixToPostfix("y = 7 + 8")) << endl;
         // cout << eval.infixToPostfix("y = a + b / c * d") << endl;
         // cout << eval.infixToPostfix("y = a + 5.0 / 1 * d") << endl;
         // cout << eval.infixToPostfix("y = sin( a - b ) / cos (c + d)") << endl;
 
-        cout << "Would you like to enter another expression?\nEnter q to quit or any key to continue: ";
+        cout << "\nWould you like to enter another expression?\nEnter q to quit or any key to continue: ";
         cin.get(answer);
 
         // clear buffer
@@ -63,8 +73,6 @@ int main () {
         if (answer == 'q' || answer == 'Q') done = true;
     }
     
-    // eval.showSymTable();
-
     cout << "Ending Expression Evaluator program... Goodbye!\n";
 
     return 0;

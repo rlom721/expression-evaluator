@@ -8,7 +8,6 @@
 
 #include "Hashtable.h"
 #include "Parser.h"
-// #include "Stack.h"          // for evaluating postfix expression
 #include <string>
 namespace lomboy_a2 {
 
