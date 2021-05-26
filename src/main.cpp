@@ -60,11 +60,6 @@ int main () {
             cerr << "Parse Error - " << pe.what() << endl;
         }
 
-        // cout << eval.evaluate(eval.infixToPostfix("y = 7 + 8")) << endl;
-        // cout << eval.infixToPostfix("y = a + b / c * d") << endl;
-        // cout << eval.infixToPostfix("y = a + 5.0 / 1 * d") << endl;
-        // cout << eval.infixToPostfix("y = sin( a - b ) / cos (c + d)") << endl;
-
         cout << "\nWould you like to enter another expression?\nEnter q to quit or any key to continue: ";
         cin.get(answer);
 
