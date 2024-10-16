@@ -28,7 +28,7 @@ int main () {
 
     cout << "Welcome to the Expression Evaluator!\n"
          << " This program evaluates expressions written in infix format.\n"
-         << " It supports addition, subtraction, divison, multiplication operators and\n"
+         << " It supports addition, subtraction, division, multiplication operators and\n"
          << " the following unary operators: sin, cos, abs (absolute value) and sqrt (square \n"
          << " root). It also supports user-defined variables.\n"
          << "IMPORTANT:\n -use of unary operators require parentheses (ex. sin(x)).\n"
