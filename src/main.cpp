@@ -1,12 +1,15 @@
 // Program Name:    Expression Evaluator
 // File Name:       main.cpp
 // Author:          Rafaela Lomboy
-// Date:            2021.03.26
-// Description:     This program...
+// Date:            2021.04.02
+// Description:     This program evaluates expressions after first converting 
+//                  them from infix to postfix format. It supports addition, 
+//                  subtraction, division, multiplication operators and sin, 
+//                  cos, absolute value and square root. 
 
 #include "Evaluator.h"
 #include "Parser.h"
-#include "ParseErr.h"
+#include "ParseErr.h"   // for parse errors
 #include <iostream>
 #include <string>
 #include <limits>       // for cin.ignore()

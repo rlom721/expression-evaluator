@@ -5,15 +5,14 @@
 #include "ParseErr.h"
 #include "Stack.h"          // for evaluating postfix expression
 #include "Stack.cpp"
-#include "Queue.h"          // for evaluating postfix expression
+#include "Queue.h"          
 #include "Queue.cpp"
-#include "List.h"          // for evaluating postfix expression
+#include "List.h"          
 #include "List.cpp"
-#include "ListItem.h"          // for evaluating postfix expression
+#include "ListItem.h"        
 #include "ListItem.cpp"
-#include <iostream>     // for cout
+#include <iostream>    
 #include <string>
-#include <cassert>
 using namespace std;
 namespace lomboy_a2 {
 
@@ -58,8 +57,6 @@ namespace lomboy_a2 {
 
     // This method takes an expression in infix form and returns it as a postfix.
     string Parser::infixToPostfix(string expression) { 
-        // Queue<string> s1;    // holds operands, then postfix format in reverse
-        // Stack<string> s2;    // used in getAction and postfix conversion
         string postfix;             // final postfix format
         Stack<string> tempStack;    // for popping to get postfix result
         string token;               // current token

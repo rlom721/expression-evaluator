@@ -1,7 +1,7 @@
 // Specification file for Evaluator class
 //
-// This class provides methods for converting an expression from infix to 
-// postfix and evaluating it.
+// This class provides a method for evaluating a postfix expression.
+// It also has a Symbol Table to allow for user-defined variables.
 
 #ifndef EVALUATOR_H
 #define EVALUATOR_H
